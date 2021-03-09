@@ -1,6 +1,6 @@
-.PHONY: start
+.PHONY: web test
 
-start:
+web:
 	go run cmd/web/main.go
 
 test:
