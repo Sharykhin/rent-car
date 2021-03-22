@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 
 	guuid "github.com/google/uuid"
 )
@@ -14,6 +15,10 @@ type (
 // String returns string representation of ID
 func (id ID) String() string {
 	return string(id)
+}
+
+func (id ID) IsEmpty() bool {
+	return strings.Trim(id.String(), " ") == ""
 }
 
 // ParseID validates an id and return custom ID if there are no errors
