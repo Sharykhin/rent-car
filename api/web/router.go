@@ -2,7 +2,12 @@ package web
 
 import (
 	"Sharykhin/rent-car/api/web/controller"
+	"Sharykhin/rent-car/domain/car/services"
+	"Sharykhin/rent-car/infrastructure/postgres"
+	"Sharykhin/rent-car/infrastructure/postgres/repositories"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -16,8 +21,11 @@ func router() http.Handler {
 	}).Methods("GET")
 
 	sr := r.PathPrefix("/v1").Subrouter()
-
-	carController := controller.CarController{}
+	db, err := postgres.Connect(os.Getenv("POSTGRES_URL"))
+	if err != nil {
+		log.Fatalf("failed to connect to postgres: %v", err)
+	}
+	carController := controller.NewCarController(services.NewCarService(repositories.NewCarRepository(db)))
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 
 	return r

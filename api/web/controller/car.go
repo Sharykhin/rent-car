@@ -1,16 +1,18 @@
 package controller
 
 import (
-	"Sharykhin/rent-car/domain"
 	"encoding/json"
 	"errors"
 	"net/http"
 
+	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car/services"
 )
 
 type (
 	CarController struct {
+		carService *services.CarService
 	}
 
 	CreateCarPayload struct {
@@ -25,6 +27,14 @@ type (
 		Message string `json:"message"`
 	}
 )
+
+func NewCarController(carService *services.CarService) *CarController {
+	ctrl := CarController{
+		carService: carService,
+	}
+
+	return &ctrl
+}
 
 func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -43,9 +53,15 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	car := models.NewCar(payload.Model)
+	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(FailResponse{
+			Message: err.Error(),
+		})
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(CreateResponse{
-		ID: car.ID.String(),
-	})
+	_ = json.NewEncoder(w).Encode(&car)
 }
