@@ -37,3 +37,7 @@ func NewID() ID {
 
 	return ID(guid.String())
 }
+
+func Empty() ID {
+	return ID("")
+}

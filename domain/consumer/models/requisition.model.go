@@ -10,11 +10,11 @@ type Requisition struct {
 	Car models.Car
 }
 
-func NewRequisition(car models.Car) Requisition {
+func NewRequisition(car models.Car) *Requisition {
 	requisition := Requisition{
-		ID:  domain.NewID(),
+		ID:  domain.Empty(),
 		Car: car,
 	}
 
-	return requisition
+	return &requisition
 }

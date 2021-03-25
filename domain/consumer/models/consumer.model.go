@@ -18,18 +18,18 @@ func (c *Consumer) RentCar(car carModels.Car) error {
 	}
 
 	requisition := NewRequisition(car)
-	c.Requisitions = append(c.Requisitions, requisition)
+	c.Requisitions = append(c.Requisitions, *requisition)
 
 	return nil
 }
 
 // NewConsumer creates a new consumer
-func NewConsumer(name string, requisitions []Requisition) Consumer {
+func NewConsumer(name string, requisitions []Requisition) *Consumer {
 	consumer := Consumer{
-		ID:           domain.NewID(),
+		ID:           domain.Empty(),
 		Name:         name,
 		Requisitions: requisitions,
 	}
 
-	return consumer
+	return &consumer
 }

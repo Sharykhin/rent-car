@@ -14,7 +14,7 @@ type Car struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// TODO: this is a good way but is rather for view between back to back it may be different
+// TODO: this is a good way but is rather for view, between back to back it may be different
 func (c *Car) MarshalJSON() ([]byte, error) {
 	type Alias Car
 
@@ -23,7 +23,7 @@ func (c *Car) MarshalJSON() ([]byte, error) {
 		CreatedAt string `json:"created_at"`
 	}{
 		Alias:     (*Alias)(c),
-		CreatedAt: c.CreatedAt.Format("Mon Jan _2"),
+		CreatedAt: c.CreatedAt.Format(time.RFC3339),
 	})
 }
 

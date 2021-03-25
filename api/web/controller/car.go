@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"Sharykhin/rent-car/api/web/response"
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/models"
 	"Sharykhin/rent-car/domain/car/services"
@@ -43,25 +44,17 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&payload)
 	if err != nil {
 		if errors.Is(err, domain.InvalidCarModelError) {
-			w.WriteHeader(http.StatusBadRequest)
+			response.BadRequest(w, err.Error(), "VALIDATION")
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
+			response.Internal(w, err.Error())
 		}
-		_ = json.NewEncoder(w).Encode(FailResponse{
-			Message: err.Error(),
-		})
 		return
 	}
 
 	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_ = json.NewEncoder(w).Encode(FailResponse{
-			Message: err.Error(),
-		})
-		return
+		response.Internal(w, err.Error())
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(&car)
+	response.Created(w, car, nil)
 }
