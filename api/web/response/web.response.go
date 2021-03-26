@@ -111,30 +111,9 @@ func Fail(w http.ResponseWriter, message string, code domain.Code) {
 	}
 }
 
-func NotFound(w http.ResponseWriter, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNotFound)
-	r := WebErrorResponse{
-		Error: Error{
-			Code:    domain.ResourceNotFoundErrorCode,
-			Message: message,
-		},
-	}
-	err := json.NewEncoder(w).Encode(&r)
-	if err != nil {
-		log.Printf("failed to encode http response: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err = w.Write([]byte("Internal Server Error"))
-		if err != nil {
-			log.Printf("failed to write http response: %v", err)
-		}
-	}
-
-}
-
 func Internal(w http.ResponseWriter, message string) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(http.StatusInternalServerError)
 	r := WebErrorResponse{
 		Error: Error{
 			Code:    domain.InternalServerErrorCode,

@@ -2,7 +2,8 @@ package web
 
 import (
 	"Sharykhin/rent-car/api/web/controller"
-	"Sharykhin/rent-car/domain/car/services"
+	carServices "Sharykhin/rent-car/domain/car/services"
+	consumerServices "Sharykhin/rent-car/domain/consumer/services"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 	"log"
@@ -25,10 +26,12 @@ func router() http.Handler {
 	if err != nil {
 		log.Fatalf("failed to connect to postgres: %v", err)
 	}
-	carController := controller.NewCarController(services.NewCarService(repositories.NewCarRepository(db)))
+	carController := controller.NewCarController(carServices.NewCarService(repositories.NewCarRepository(db)))
+	consumerController := controller.NewConsumerController(consumerServices.NewConsumerService(repositories.NewConsumerRepository(db)))
 
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")
+	sr.HandleFunc("/consumers", consumerController.CreateConsumer).Methods("POST")
 
 	return r
 }

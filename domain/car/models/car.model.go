@@ -37,15 +37,3 @@ func NewCar(model Model) *Car {
 
 	return &car
 }
-
-// RestoreCar restores domain model from its resource with all the data
-// it is used in infrastructure to restore model from plaint database data
-func RestoreCar(ID domain.ID, model Model, createdAt time.Time) *Car {
-	car := Car{
-		ID:        ID,
-		Model:     model,
-		CreatedAt: createdAt,
-	}
-
-	return &car
-}
