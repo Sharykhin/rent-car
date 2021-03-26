@@ -30,9 +30,21 @@ func (c *Car) MarshalJSON() ([]byte, error) {
 // NewCar create a new car model
 func NewCar(model Model) *Car {
 	car := Car{
-		ID:        domain.ID(""),
+		ID:        domain.Empty(),
 		Model:     model,
 		CreatedAt: time.Now().UTC(),
+	}
+
+	return &car
+}
+
+// RestoreCar restores domain model from its resource with all the data
+// it is used in infrastructure to restore model from plaint database data
+func RestoreCar(ID domain.ID, model Model, createdAt time.Time) *Car {
+	car := Car{
+		ID:        ID,
+		Model:     model,
+		CreatedAt: createdAt,
 	}
 
 	return &car

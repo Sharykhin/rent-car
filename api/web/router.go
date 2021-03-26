@@ -26,7 +26,9 @@ func router() http.Handler {
 		log.Fatalf("failed to connect to postgres: %v", err)
 	}
 	carController := controller.NewCarController(services.NewCarService(repositories.NewCarRepository(db)))
+
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
+	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")
 
 	return r
 }

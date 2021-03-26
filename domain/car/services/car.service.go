@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/intefaces"
 	"Sharykhin/rent-car/domain/car/models"
 )
@@ -20,6 +22,7 @@ func NewCarService(carRepository intefaces.CarRepositoryInterface) *CarService {
 	return &srv
 }
 
+// CreateNewCar create a new car
 func (s *CarService) CreateNewCar(ctx context.Context, model models.Model) (*models.Car, error) {
 	car := models.NewCar(model)
 
@@ -29,4 +32,15 @@ func (s *CarService) CreateNewCar(ctx context.Context, model models.Model) (*mod
 	}
 
 	return car, nil
+}
+
+// GetCarByID returns a specific car by its ID
+func (s *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*models.Car, error) {
+	car, err := s.carRepository.GetCarByID(ctx, ID)
+
+	if err != nil {
+		return nil, domain.WrapError(errors.New("failed to get a car from the car service"), err)
+	}
+
+	return car, err
 }
