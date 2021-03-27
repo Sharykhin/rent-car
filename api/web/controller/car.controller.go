@@ -14,6 +14,7 @@ type (
 	// CarController is a web controller that handles API requests around car domain model
 	CarController struct {
 		carService *services.CarService
+		logger     domain.LoggerInterface
 	}
 
 	// CreateCarPayload this is a request body for creating a new car
@@ -22,9 +23,10 @@ type (
 	}
 )
 
-func NewCarController(carService *services.CarService) *CarController {
+func NewCarController(carService *services.CarService, logger domain.LoggerInterface) *CarController {
 	ctrl := CarController{
 		carService: carService,
+		logger:     logger,
 	}
 
 	return &ctrl
@@ -36,6 +38,7 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&payload)
 
 	if err != nil {
+		c.logger.Error(err.Error(), err)
 		if err, ok := err.(*domain.Error); ok {
 			response.Fail(w, err.Message, err.Code)
 			return
@@ -46,6 +49,7 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
+		c.logger.Error(err.Error(), err)
 		if err, ok := err.(*domain.Error); ok {
 			response.Fail(w, err.Message, err.Code)
 			return

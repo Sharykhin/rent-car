@@ -1,6 +1,7 @@
 package web
 
 import (
+	"Sharykhin/rent-car/infrastructure/logger"
 	"log"
 	"net/http"
 	"os"
@@ -31,8 +32,18 @@ func router() http.Handler {
 	sr := r.PathPrefix("/v1").Subrouter()
 	sr.Use(middleware.LoggingMiddleware, middleware.JsonMiddleware)
 
-	carController := controller.NewCarController(carServices.NewCarService(repositories.NewCarRepository(db)))
-	consumerController := controller.NewConsumerController(consumerServices.NewConsumerService(repositories.NewConsumerRepository(db)))
+	carController := controller.NewCarController(
+		carServices.NewCarService(
+			repositories.NewCarRepository(db),
+		),
+		logger.NewLogger(),
+	)
+	consumerController := controller.NewConsumerController(
+		consumerServices.NewConsumerService(
+			repositories.NewConsumerRepository(db),
+		),
+		logger.NewLogger(),
+	)
 
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")

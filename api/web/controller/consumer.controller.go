@@ -12,6 +12,7 @@ import (
 type (
 	ConsumerController struct {
 		consumerService *services.ConsumerService
+		logger          domain.LoggerInterface
 	}
 
 	CreateConsumerPayload struct {
@@ -21,9 +22,10 @@ type (
 	}
 )
 
-func NewConsumerController(consumerService *services.ConsumerService) *ConsumerController {
+func NewConsumerController(consumerService *services.ConsumerService, logger domain.LoggerInterface) *ConsumerController {
 	ctrl := ConsumerController{
 		consumerService: consumerService,
+		logger:          logger,
 	}
 
 	return &ctrl
@@ -35,6 +37,7 @@ func (c *ConsumerController) CreateConsumer(w http.ResponseWriter, r *http.Reque
 	err := decoder.Decode(&payload)
 
 	if err != nil {
+		c.logger.Error(err.Error(), "ConsumerController")
 		if err, ok := err.(*domain.Error); ok {
 			response.Fail(w, err.Message, err.Code)
 			return
@@ -45,6 +48,7 @@ func (c *ConsumerController) CreateConsumer(w http.ResponseWriter, r *http.Reque
 
 	consumer, err := c.consumerService.CreateNewConsumer(r.Context(), payload.FirstName, payload.LastName, payload.Email)
 	if err != nil {
+		c.logger.Error(err.Error(), "ConsumerController")
 		if err, ok := err.(*domain.Error); ok {
 			response.Fail(w, err.Message, err.Code)
 			return
