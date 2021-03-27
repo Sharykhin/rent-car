@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 
 	"Sharykhin/rent-car/api/web/response"
@@ -12,10 +11,12 @@ import (
 )
 
 type (
+	// CarController is a web controller that handles API requests around car domain model
 	CarController struct {
 		carService *services.CarService
 	}
 
+	// CreateCarPayload this is a request body for creating a new car
 	CreateCarPayload struct {
 		Model models.Model `json:"model"`
 	}
@@ -36,7 +37,7 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err, ok := err.(*domain.Error); ok {
-			response.BadRequest(w, err.Error(), err.Code)
+			response.Fail(w, err.Message, err.Code)
 			return
 		}
 		response.Internal(w, err.Error())
@@ -45,7 +46,12 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
+		if err, ok := err.(*domain.Error); ok {
+			response.Fail(w, err.Message, err.Code)
+			return
+		}
 		response.Internal(w, err.Error())
+		return
 	}
 
 	response.Created(w, car, nil)
@@ -58,7 +64,7 @@ func (c *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err, ok := err.(*domain.Error); ok {
-			response.Fail(w, err.Error(), err.Code)
+			response.Fail(w, err.Message, err.Code)
 			return
 		}
 		response.Internal(w, err.Error())
@@ -67,9 +73,4 @@ func (c *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 
 	response.Success(w, car, nil)
 
-}
-
-func getUrlParam(r *http.Request, name string) string {
-	vars := mux.Vars(r)
-	return vars[name]
 }

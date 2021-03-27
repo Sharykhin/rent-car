@@ -17,7 +17,7 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 	var s string
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		return domain.NewError(err, domain.InternalServerErrorCode)
+		return domain.NewError(err, domain.InternalServerErrorCode, "Something went wrong.")
 	}
 	model := Model(strings.Title(strings.ToLower(s)))
 	switch model {
@@ -26,5 +26,5 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return domain.NewError(domain.InvalidCarModelError, domain.ValidationErrorCode)
+	return domain.NewError(domain.InvalidCarModelError, domain.ValidationErrorCode, "Car model is invalid.")
 }

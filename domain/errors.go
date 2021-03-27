@@ -8,8 +8,9 @@ import (
 type (
 	Code  string
 	Error struct {
-		Code Code
-		Err  error
+		Code    Code
+		Err     error
+		Message string
 	}
 )
 
@@ -33,10 +34,11 @@ var (
 	InvalidCarModelError          = errors.New("car model is invalid")
 )
 
-func NewError(err error, code Code) *Error {
+func NewError(err error, code Code, message string) *Error {
 	return &Error{
-		Code: code,
-		Err:  err,
+		Code:    code,
+		Err:     err,
+		Message: message,
 	}
 }
 

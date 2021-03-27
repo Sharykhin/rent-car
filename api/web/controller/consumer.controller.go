@@ -36,7 +36,7 @@ func (c *ConsumerController) CreateConsumer(w http.ResponseWriter, r *http.Reque
 
 	if err != nil {
 		if err, ok := err.(*domain.Error); ok {
-			response.BadRequest(w, err.Error(), err.Code)
+			response.Fail(w, err.Message, err.Code)
 			return
 		}
 		response.Internal(w, err.Error())
@@ -46,7 +46,7 @@ func (c *ConsumerController) CreateConsumer(w http.ResponseWriter, r *http.Reque
 	consumer, err := c.consumerService.CreateNewConsumer(r.Context(), payload.FirstName, payload.LastName, payload.Email)
 	if err != nil {
 		if err, ok := err.(*domain.Error); ok {
-			response.Fail(w, err.Error(), err.Code)
+			response.Fail(w, err.Message, err.Code)
 			return
 		}
 		response.Internal(w, err.Error())

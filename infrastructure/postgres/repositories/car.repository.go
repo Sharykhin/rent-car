@@ -27,7 +27,7 @@ func (r *CarRepository) Create(ctx context.Context, car models.Car) (*models.Car
 	stmt := `insert into public.cars(model, created_at) values($1, $2) returning id`
 	err := r.db.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to insert a new record into cars table: %v", err)
+		return nil, domain.NewError(fmt.Errorf("failed to insert a new car record into cars table: %v", err), domain.InternalServerErrorCode, "Something went wrong.")
 	}
 
 	car.ID = id
@@ -42,10 +42,10 @@ func (r *CarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*models.C
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, domain.NewError(fmt.Errorf("failed to find a car in the database: %w", domain.ResourceNotFoundError), domain.ResourceNotFoundErrorCode)
+			return nil, domain.NewError(fmt.Errorf("failed to find a car in the database: %w", domain.ResourceNotFoundError), domain.ResourceNotFoundErrorCode, "Car resource was not found.")
 		}
 
-		return nil, domain.NewError(fmt.Errorf("failed to find a car in the database: %v", err), domain.InternalServerErrorCode)
+		return nil, domain.NewError(fmt.Errorf("failed to find a car in the database: %v", err), domain.InternalServerErrorCode, "Something went wrong.")
 
 	}
 
