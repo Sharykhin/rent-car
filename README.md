@@ -10,3 +10,13 @@ To create a new migration use the following command:
 ```bash
 make migrate-create name=create_user_table
 ```
+
+To apply migrations use the following command:
+```bash
+make migrate-up
+```
+
+To run web server use the following command:
+```bash
+make web
+```
