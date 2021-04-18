@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,14 @@ func JsonMiddleware(next http.Handler) http.Handler {
 
 		if (r.Method == "POST" || r.Method == "PUT") &&
 			!strings.Contains(r.Header.Get("content-type"), "application/json") {
-			response.Fail(w, "Content-type must be application/json.", domain.ValidationErrorCode)
+
+			response.Fail(
+				w,
+				domain.NewError(
+					errors.New("Content-type must be application/json."),
+					domain.ValidationErrorCode,
+					"Content-type must be application/json.",
+				))
 			return
 		}
 

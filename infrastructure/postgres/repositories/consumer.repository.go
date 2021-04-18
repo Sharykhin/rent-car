@@ -34,9 +34,9 @@ func (r *ConsumerRepository) Create(ctx context.Context, consumer models.Consume
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == constraintUniqueCode {
-			return nil, domain.NewError(fmt.Errorf("failed to insert a new record into consumers table: email is duplicated: %v", err), domain.ValidationErrorCode, "Email is duplicated.")
+			return nil, domain.NewError(fmt.Errorf("failed to insert a new record into consumers table: %v", err), domain.ValidationErrorCode, "Email is duplicated.")
 		}
-		return nil, domain.NewError(fmt.Errorf("failed to insert a new record into consumers table: %v", err), domain.InternalServerErrorCode, "Something went wrong.")
+		return nil, fmt.Errorf("failed to insert a new record into consumers table: %v", err)
 	}
 
 	consumer.ID = id

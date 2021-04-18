@@ -15,7 +15,7 @@ type (
 )
 
 func (e Error) Error() string {
-	return e.Err.Error()
+	return fmt.Sprintf("code - %v, error - %s ", e.Code, e.Err.Error())
 }
 
 func (e Error) Unwrap() error {

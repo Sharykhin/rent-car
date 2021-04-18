@@ -39,22 +39,14 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		c.logger.Error(err.Error(), err)
-		if err, ok := err.(*domain.Error); ok {
-			response.Fail(w, err.Message, err.Code)
-			return
-		}
-		response.Internal(w, err.Error())
+		response.Fail(w, err)
 		return
 	}
 
 	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
 		c.logger.Error(err.Error(), err)
-		if err, ok := err.(*domain.Error); ok {
-			response.Fail(w, err.Message, err.Code)
-			return
-		}
-		response.Internal(w, err.Error())
+		response.Fail(w, err)
 		return
 	}
 
@@ -67,11 +59,7 @@ func (c *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	car, err := c.carService.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
-		if err, ok := err.(*domain.Error); ok {
-			response.Fail(w, err.Message, err.Code)
-			return
-		}
-		response.Internal(w, err.Error())
+		response.Fail(w, err)
 		return
 	}
 

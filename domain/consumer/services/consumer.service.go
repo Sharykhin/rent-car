@@ -6,6 +6,7 @@ import (
 	"Sharykhin/rent-car/domain/consumer/models"
 	"context"
 	"errors"
+	"fmt"
 )
 
 type ConsumerService struct {
@@ -29,7 +30,7 @@ func (s *ConsumerService) CreateNewConsumer(ctx context.Context, firstName, last
 
 	consumer, err = s.consumerRepository.Create(ctx, *consumer)
 	if err != nil {
-		return nil, domain.WrapError(errors.New("failed to create a new consumer in the consumer service"), err)
+		return nil, fmt.Errorf("failed to create a new consumer in the consumer service: %w", err)
 	}
 
 	return consumer, nil

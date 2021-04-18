@@ -3,6 +3,7 @@ package models
 import (
 	"Sharykhin/rent-car/domain"
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
@@ -17,7 +18,7 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 	var s string
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		return domain.NewError(err, domain.InternalServerErrorCode, "Something went wrong.")
+		return fmt.Errorf("failed to unmarshal model type")
 	}
 	model := Model(strings.Title(strings.ToLower(s)))
 	switch model {
