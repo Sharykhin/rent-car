@@ -1,6 +1,7 @@
 package web
 
 import (
+	"Sharykhin/rent-car/domain/requisition/services"
 	"Sharykhin/rent-car/infrastructure/logger"
 	"log"
 	"net/http"
@@ -44,10 +45,18 @@ func router() http.Handler {
 		),
 		logger.NewLogger(),
 	)
+	requisitionCtrl := controller.NewRequisitionController(
+		services.NewRequisitionService(
+			repositories.NewPostgresRequisitionRepository(
+				db,
+			),
+		),
+	)
 
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")
 	sr.HandleFunc("/consumers", consumerController.CreateConsumer).Methods("POST")
+	sr.HandleFunc("/requisitions", requisitionCtrl.CreateRequisition).Methods("POST")
 
 	return r
 }
