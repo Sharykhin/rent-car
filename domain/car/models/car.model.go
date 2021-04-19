@@ -1,6 +1,7 @@
 package models
 
 import (
+	"Sharykhin/rent-car/domain/car/specifications"
 	"encoding/json"
 	"time"
 
@@ -28,12 +29,22 @@ func (c *Car) MarshalJSON() ([]byte, error) {
 }
 
 // NewCar create a new car model
-func NewCar(model Model) *Car {
+func NewCar(model Model) (*Car, error) {
+
+	//if model == "" {
+	//	return nil, domain.NewError(errors.New("car model is required"), domain.ValidationErrorCode, "Car model is required.")
+	//}
+
 	car := Car{
 		ID:        domain.Empty(),
 		Model:     model,
 		CreatedAt: time.Now().UTC(),
 	}
 
-	return &car
+	err := specifications.NewIsCarModelCorrectSpecification(&car)
+	if err != nil {
+		return nil, err
+	}
+
+	return &car, nil
 }

@@ -1,10 +1,12 @@
 package response
 
 import (
+	"Sharykhin/rent-car/api/web/util"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"Sharykhin/rent-car/domain"
 )
@@ -65,21 +67,42 @@ func Created(w http.ResponseWriter, data interface{}, meta interface{}) {
 func Fail(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	var domainErr *domain.Error
+	var malformedErr *util.MalformedRequest
 	if errors.As(err, &domainErr) {
-		asDomainError(w, domainErr.Message, domainErr.Code)
+		asDomainError(w, domainErr.Message, domainErr.Code, err)
 		return
 	}
-	asDomainError(w, err.Error(), domain.InternalServerErrorCode)
+	if errors.As(err, &malformedErr) {
+		asNativeError(w, malformedErr.Status, malformedErr.Msg, domain.ValidationErrorCode, err)
+		return
+	}
+	asDomainError(w, err.Error(), domain.InternalServerErrorCode, err)
 }
 
-func asDomainError(w http.ResponseWriter, message string, code domain.Code) {
-	w.Header().Set("Content-Type", "application/json")
+func asNativeError(w http.ResponseWriter, status int, msg string, code domain.Code, origin error) {
+	switch status {
+	case http.StatusInternalServerError:
+		log.Error(origin)
+	}
+
+	w.WriteHeader(status)
+	r := errorResponse{
+		Error: webError{
+			Code:    code,
+			Message: msg,
+		},
+	}
+	sendErrorResponse(w, &r)
+}
+
+func asDomainError(w http.ResponseWriter, message string, code domain.Code, origin error) {
 	switch code {
 	case domain.ResourceNotFoundErrorCode:
 		w.WriteHeader(http.StatusNotFound)
 	case domain.ValidationErrorCode:
 		w.WriteHeader(http.StatusBadRequest)
 	default:
+		log.Error(origin)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -89,6 +112,10 @@ func asDomainError(w http.ResponseWriter, message string, code domain.Code) {
 			Message: message,
 		},
 	}
+	sendErrorResponse(w, &r)
+}
+
+func sendErrorResponse(w http.ResponseWriter, r *errorResponse) {
 	err := json.NewEncoder(w).Encode(&r)
 	if err != nil {
 		log.Printf("failed to encode http response: %v", err)

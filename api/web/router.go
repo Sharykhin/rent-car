@@ -1,8 +1,6 @@
 package web
 
 import (
-	"Sharykhin/rent-car/domain/requisition/services"
-	"Sharykhin/rent-car/infrastructure/logger"
 	"log"
 	"net/http"
 	"os"
@@ -11,8 +9,9 @@ import (
 
 	"Sharykhin/rent-car/api/web/controller"
 	"Sharykhin/rent-car/api/web/middleware"
-	carServices "Sharykhin/rent-car/domain/car/services"
+	carSrvs "Sharykhin/rent-car/domain/car/services"
 	consumerServices "Sharykhin/rent-car/domain/consumer/services"
+	"Sharykhin/rent-car/domain/requisition/services"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 )
@@ -34,16 +33,14 @@ func router() http.Handler {
 	sr.Use(middleware.LoggingMiddleware, middleware.JsonMiddleware)
 
 	carController := controller.NewCarController(
-		carServices.NewCarService(
+		carSrvs.NewCarService(
 			repositories.NewCarRepository(db),
 		),
-		logger.NewLogger(),
 	)
 	consumerController := controller.NewConsumerController(
 		consumerServices.NewConsumerService(
 			repositories.NewConsumerRepository(db),
 		),
-		logger.NewLogger(),
 	)
 	requisitionCtrl := controller.NewRequisitionController(
 		services.NewRequisitionService(

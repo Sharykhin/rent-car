@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"Sharykhin/rent-car/api/web/response"
+	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/models"
 	"Sharykhin/rent-car/domain/car/services"
@@ -13,8 +13,7 @@ import (
 type (
 	// CarController is a web controller that handles API requests around car domain model
 	CarController struct {
-		carService *services.CarService
-		logger     domain.LoggerInterface
+		carSrv *services.CarService
 	}
 
 	// CreateCarPayload this is a request body for creating a new car
@@ -23,29 +22,25 @@ type (
 	}
 )
 
-func NewCarController(carService *services.CarService, logger domain.LoggerInterface) *CarController {
+func NewCarController(carSrv *services.CarService) *CarController {
 	ctrl := CarController{
-		carService: carService,
-		logger:     logger,
+		carSrv: carSrv,
 	}
 
 	return &ctrl
 }
 
-func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	var payload CreateCarPayload
-	err := decoder.Decode(&payload)
+	err := util.DecodeJSONBody(w, r, &payload)
 
 	if err != nil {
-		c.logger.Error(err.Error(), err)
 		response.Fail(w, err)
 		return
 	}
 
-	car, err := c.carService.CreateNewCar(r.Context(), payload.Model)
+	car, err := ctrl.carSrv.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
-		c.logger.Error(err.Error(), err)
 		response.Fail(w, err)
 		return
 	}
@@ -53,10 +48,10 @@ func (c *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	response.Created(w, car, nil)
 }
 
-func (c *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
+func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	ID := getUrlParam(r, "id")
 
-	car, err := c.carService.GetCarByID(r.Context(), domain.ID(ID))
+	car, err := ctrl.carSrv.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
 		response.Fail(w, err)

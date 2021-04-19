@@ -24,11 +24,14 @@ func NewCarService(carRepository intefaces.CarRepositoryInterface) *CarService {
 
 // CreateNewCar create a new car
 func (s *CarService) CreateNewCar(ctx context.Context, model models.Model) (*models.Car, error) {
-	car := models.NewCar(model)
-
-	car, err := s.carRepository.Create(ctx, *car)
+	car, err := models.NewCar(model)
 	if err != nil {
-		return nil, fmt.Errorf("failed to craete a new car: %v", err)
+		return nil, fmt.Errorf("failed to create a new instance of car model: %w", err)
+	}
+
+	car, err = s.carRepository.Create(ctx, *car)
+	if err != nil {
+		return nil, fmt.Errorf("failed to craete a new car: %w", err)
 	}
 
 	return car, nil

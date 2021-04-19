@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"Sharykhin/rent-car/api/web/response"
-	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/consumer/services"
 )
 
 type (
 	ConsumerController struct {
 		consumerService *services.ConsumerService
-		logger          domain.LoggerInterface
 	}
 
 	CreateConsumerPayload struct {
@@ -22,10 +22,9 @@ type (
 	}
 )
 
-func NewConsumerController(consumerService *services.ConsumerService, logger domain.LoggerInterface) *ConsumerController {
+func NewConsumerController(consumerService *services.ConsumerService) *ConsumerController {
 	ctrl := ConsumerController{
 		consumerService: consumerService,
-		logger:          logger,
 	}
 
 	return &ctrl
@@ -37,14 +36,14 @@ func (c *ConsumerController) CreateConsumer(w http.ResponseWriter, r *http.Reque
 	err := decoder.Decode(&payload)
 
 	if err != nil {
-		c.logger.Error(err.Error())
+		log.Error(err)
 		response.Fail(w, err)
 		return
 	}
 
 	consumer, err := c.consumerService.CreateNewConsumer(r.Context(), payload.FirstName, payload.LastName, payload.Email)
 	if err != nil {
-		c.logger.Error(err.Error())
+		log.Error(err)
 		response.Fail(w, err)
 		return
 	}
