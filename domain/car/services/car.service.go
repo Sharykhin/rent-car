@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
@@ -11,25 +10,25 @@ import (
 )
 
 type CarService struct {
-	carRepository intefaces.CarRepositoryInterface
+	carRepo intefaces.CarRepositoryInterface
 }
 
-func NewCarService(carRepository intefaces.CarRepositoryInterface) *CarService {
+func NewCarService(carRepo intefaces.CarRepositoryInterface) *CarService {
 	srv := CarService{
-		carRepository: carRepository,
+		carRepo: carRepo,
 	}
 
 	return &srv
 }
 
-// CreateNewCar create a new car
-func (s *CarService) CreateNewCar(ctx context.Context, model models.Model) (*models.Car, error) {
+// CreateNewCar creates a new car
+func (srv *CarService) CreateNewCar(ctx context.Context, model models.Model) (*models.Car, error) {
 	car, err := models.NewCar(model)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a new instance of car model: %w", err)
 	}
 
-	car, err = s.carRepository.Create(ctx, *car)
+	car, err = srv.carRepo.Create(ctx, *car)
 	if err != nil {
 		return nil, fmt.Errorf("failed to craete a new car: %w", err)
 	}
@@ -38,11 +37,11 @@ func (s *CarService) CreateNewCar(ctx context.Context, model models.Model) (*mod
 }
 
 // GetCarByID returns a specific car by its ID
-func (s *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*models.Car, error) {
-	car, err := s.carRepository.GetCarByID(ctx, ID)
+func (srv *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*models.Car, error) {
+	car, err := srv.carRepo.GetCarByID(ctx, ID)
 
 	if err != nil {
-		return nil, domain.WrapError(errors.New("failed to get a car from the car service"), err)
+		return nil, fmt.Errorf("failed to get a car from the car service: %w", err)
 	}
 
 	return car, err

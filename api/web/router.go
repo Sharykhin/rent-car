@@ -10,13 +10,15 @@ import (
 	"Sharykhin/rent-car/api/web/controller"
 	"Sharykhin/rent-car/api/web/middleware"
 	carSrvs "Sharykhin/rent-car/domain/car/services"
-	consumerServices "Sharykhin/rent-car/domain/consumer/services"
+	consumerSrvs "Sharykhin/rent-car/domain/consumer/services"
 	"Sharykhin/rent-car/domain/requisition/services"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 )
 
 func router() http.Handler {
+	// TODO: move it into the server
+	// TODO: check whether lorgus works across the whole app with log level on top
 	db, err := postgres.Connect(os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		log.Fatalf("failed to connect to postgres: %v", err)
@@ -38,7 +40,7 @@ func router() http.Handler {
 		),
 	)
 	consumerController := controller.NewConsumerController(
-		consumerServices.NewConsumerService(
+		consumerSrvs.NewConsumerService(
 			repositories.NewConsumerRepository(db),
 		),
 	)

@@ -1,11 +1,11 @@
 package models
 
 import (
-	"Sharykhin/rent-car/domain/car/specifications"
 	"encoding/json"
 	"time"
 
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car/specifications"
 )
 
 // Car represents a car that consumers will rent
