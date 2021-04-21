@@ -42,6 +42,10 @@ func NewError(err error, code Code, message string) *Error {
 	}
 }
 
+func NewInternalError(err error) *Error {
+	return NewError(err, InternalServerErrorCode, "Something went wrong")
+}
+
 func WrapError(err error, target error) *Error {
 	targetErr, ok := target.(*Error)
 	if !ok {

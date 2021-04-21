@@ -1,14 +1,19 @@
 package specifications
 
 import (
-	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
 	"errors"
+
+	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car"
 )
 
-func NewIsCarModelCorrectSpecification(car *models.Car) error {
+func NewIsCarModelCorrectSpecification(car *car.CarModel) error {
 	if car.Model == "" {
-		return domain.NewError(errors.New("car model is required"), domain.ValidationErrorCode, "Car model is required.")
+		return domain.NewError(
+			errors.New("[car][specifications][NewIsCarModelCorrectSpecification] car model is required"),
+			domain.ValidationErrorCode,
+			"Car model is required.",
+		)
 	}
 
 	return nil

@@ -2,7 +2,7 @@ package models
 
 import (
 	"Sharykhin/rent-car/domain"
-	carModels "Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car"
 	"errors"
 	"time"
 )
@@ -17,13 +17,13 @@ type Consumer struct {
 	Requisitions []Requisition
 }
 
-func (c *Consumer) RentCar(car carModels.Car) error {
-	if len(c.Requisitions) > 2 {
+func (cs *Consumer) RentCar(c *car.CarModel) error {
+	if len(cs.Requisitions) > 2 {
 		return domain.RequisitionLimitExceededError
 	}
 
-	requisition := NewRequisition(car)
-	c.Requisitions = append(c.Requisitions, *requisition)
+	requisition := NewRequisition(c)
+	cs.Requisitions = append(cs.Requisitions, *requisition)
 
 	return nil
 }

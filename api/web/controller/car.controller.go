@@ -6,8 +6,8 @@ import (
 	"Sharykhin/rent-car/api/web/response"
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
 	"Sharykhin/rent-car/domain/car/services"
+	"Sharykhin/rent-car/domain/car/types"
 )
 
 type (
@@ -18,7 +18,7 @@ type (
 
 	// CreateCarPayload this is a request body for creating a new car
 	CreateCarPayload struct {
-		Model models.Model `json:"model"`
+		Model types.Model `json:"model"`
 	}
 )
 
@@ -39,25 +39,25 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	car, err := ctrl.carSrv.CreateNewCar(r.Context(), payload.Model)
+	c, err := ctrl.carSrv.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
 		response.Fail(w, err)
 		return
 	}
 
-	response.Created(w, car, nil)
+	response.Created(w, c, nil)
 }
 
 func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	ID := getUrlParam(r, "id")
 
-	car, err := ctrl.carSrv.GetCarByID(r.Context(), domain.ID(ID))
+	c, err := ctrl.carSrv.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
 		response.Fail(w, err)
 		return
 	}
 
-	response.Success(w, car, nil)
+	response.Success(w, c, nil)
 
 }

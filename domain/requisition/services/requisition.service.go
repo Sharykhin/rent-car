@@ -2,7 +2,7 @@ package services
 
 import (
 	"Sharykhin/rent-car/domain"
-	models3 "Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car"
 	models2 "Sharykhin/rent-car/domain/consumer/models"
 	"Sharykhin/rent-car/domain/requisition/interfaces"
 	"Sharykhin/rent-car/domain/requisition/models"
@@ -34,7 +34,7 @@ func (srv *RequisitionService) RentCar(ctx context.Context) (*models.Requisition
 			CreatedAt:    time.Now(),
 			Requisitions: nil,
 		},
-		Car: &models3.Car{
+		Car: &car.CarModel{
 			ID: domain.ID("a87be964-770d-4af5-9269-b9874f1fadc0"),
 		},
 		DateFrom:  time.Now(),

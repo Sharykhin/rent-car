@@ -1,15 +1,16 @@
 package intefaces
 
 import (
-	"Sharykhin/rent-car/domain"
 	"context"
 
-	"Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car"
 )
 
 type (
+	// CarRepositoryInterface represents car repository methods
 	CarRepositoryInterface interface {
-		Create(ctx context.Context, car models.Car) (*models.Car, error)
-		GetCarByID(ctx context.Context, ID domain.ID) (*models.Car, error)
+		Create(ctx context.Context, c *car.CarModel) (*car.CarModel, error)
+		GetCarByID(ctx context.Context, ID domain.ID) (*car.CarModel, error)
 	}
 )
