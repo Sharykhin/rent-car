@@ -1,12 +1,10 @@
-package car
+package models
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/specifications"
 	"Sharykhin/rent-car/domain/car/types"
 )
 
@@ -17,7 +15,8 @@ type CarModel struct {
 	CreatedAt time.Time   `json:"created_at"`
 }
 
-// TODO: this is a good way but is rather for view, between back to back it may be different
+// MarshalJSON implements Marshaler interface to represent
+// car model into json format.
 func (c *CarModel) MarshalJSON() ([]byte, error) {
 	type Alias CarModel
 
@@ -28,20 +27,4 @@ func (c *CarModel) MarshalJSON() ([]byte, error) {
 		Alias:     (*Alias)(c),
 		CreatedAt: c.CreatedAt.Format(time.RFC3339),
 	})
-}
-
-// NewCar create a new car model
-func NewCarModel(m types.Model) (*CarModel, error) {
-	c := CarModel{
-		ID:        domain.Empty(),
-		Model:     m,
-		CreatedAt: time.Now().UTC(),
-	}
-
-	err := specifications.NewIsCarModelCorrectSpecification(&c)
-	if err != nil {
-		return nil, fmt.Errorf("[car][NewCarModel] failed to create a new car model: %w", err)
-	}
-
-	return &c, nil
 }

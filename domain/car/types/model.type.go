@@ -11,17 +11,19 @@ import (
 type Model string
 
 const (
-	Audi Model = "Audi"
-	BMW        = "BMW"
+	Audi Model = "audi"
+	BMW        = "bmw"
 )
 
+// UnmarshalJSON implements Unmarshaler interface to convert json model representation into
+// Model type
 func (m *Model) UnmarshalJSON(b []byte) error {
 	var s string
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		return fmt.Errorf("[car][types][UnmarshalJSON] failed to unmarshal model type: %v", err)
+		return fmt.Errorf("[domain][car][types][UnmarshalJSON] failed to unmarshal model type: %v", err)
 	}
-	model := Model(strings.Title(strings.ToLower(s)))
+	model := Model(strings.ToLower(s))
 	switch model {
 	case Audi, BMW:
 		*m = model
@@ -29,7 +31,7 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 	}
 
 	return domain.NewError(
-		fmt.Errorf("[car][types][UnmarshalJSON] car model is invalid: %v", m),
+		fmt.Errorf("[domain][car][types][UnmarshalJSON] car model is invalid: %v", m),
 		domain.ValidationErrorCode,
 		"Car model is invalid.",
 	)

@@ -2,7 +2,7 @@ package models
 
 import (
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car"
+	"Sharykhin/rent-car/domain/car/models"
 	"errors"
 	"time"
 )
@@ -17,7 +17,7 @@ type Consumer struct {
 	Requisitions []Requisition
 }
 
-func (cs *Consumer) RentCar(c *car.CarModel) error {
+func (cs *Consumer) RentCar(c *models.CarModel) error {
 	if len(cs.Requisitions) > 2 {
 		return domain.RequisitionLimitExceededError
 	}

@@ -8,7 +8,7 @@ endif
 current_dir = $(shell pwd)
 
 web:
-	go run cmd/web/main.go
+	LOG_LEVEL=debug go run cmd/web/main.go
 
 test:
 	go run cmd/cli/main.go

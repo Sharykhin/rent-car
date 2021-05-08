@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car"
+	"Sharykhin/rent-car/domain/car/models"
 )
 
 type CarRepository struct {
@@ -22,27 +22,27 @@ func NewCarRepository(db *sql.DB) *CarRepository {
 	return &r
 }
 
-func (r *CarRepository) Create(ctx context.Context, c *car.CarModel) (*car.CarModel, error) {
+func (r *CarRepository) CreateCar(ctx context.Context, car *models.CarModel) (*models.CarModel, error) {
 	var id domain.ID
 	stmt := `insert into public.cars(model, created_at) values($1, $2) returning id`
-	err := r.db.QueryRowContext(ctx, stmt, c.Model, c.CreatedAt).Scan(&id)
+	err := r.db.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
 	if err != nil {
 		return nil, domain.NewInternalError(
 			fmt.Errorf("[infrastructure][postgres][repositories] failed to insert a new car record into cars table: %v", err),
 		)
 	}
 
-	nc := car.CarModel{
+	nc := models.CarModel{
 		ID:        id,
-		Model:     c.Model,
-		CreatedAt: c.CreatedAt,
+		Model:     car.Model,
+		CreatedAt: car.CreatedAt,
 	}
 
 	return &nc, nil
 }
 
-func (r *CarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*car.CarModel, error) {
-	c := car.CarModel{}
+func (r *CarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error) {
+	c := models.CarModel{}
 	stmt := `select id, model, created_at from public.cars where id = $1`
 	err := r.db.QueryRowContext(ctx, stmt, ID).Scan(&c.ID, &c.Model, &c.CreatedAt)
 

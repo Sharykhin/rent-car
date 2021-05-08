@@ -1,16 +1,22 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
 
 	"Sharykhin/rent-car/api/web"
 )
 
 func main() {
-	err := godotenv.Load()
+	l, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		log.Fatalf("failed to parse log level env variable")
+	}
+	log.SetLevel(l)
+
+	err = godotenv.Load()
 	if err != nil {
 		log.Fatal("Failed to load .env file")
 	}
