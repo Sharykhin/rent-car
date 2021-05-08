@@ -1,0 +1,1 @@
+drop procedure rent_car;

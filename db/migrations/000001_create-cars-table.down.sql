@@ -1,0 +1,3 @@
+DROP TABLE public.cars;
+
+DROP EXTENSION IF EXISTS "uuid-ossp" CASCADE;
