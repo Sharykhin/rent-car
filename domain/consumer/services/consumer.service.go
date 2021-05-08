@@ -1,36 +1,40 @@
 package services
 
 import (
-	"Sharykhin/rent-car/domain"
+	"context"
+	"fmt"
+
+	"Sharykhin/rent-car/domain/consumer/factories"
 	"Sharykhin/rent-car/domain/consumer/intefaces"
 	"Sharykhin/rent-car/domain/consumer/models"
-	"context"
-	"errors"
-	"fmt"
 )
 
-type ConsumerService struct {
-	consumerRepository intefaces.ConsumerRepositoryInterface
-}
+type (
+	// ConsumerService describes business use-cases around consumer domain
+	ConsumerService struct {
+		consumerRepo intefaces.ConsumerRepositoryInterface
+	}
+)
 
-func NewConsumerService(consumerRepository intefaces.ConsumerRepositoryInterface) *ConsumerService {
+// NewConsumerService is a function constructor that creates a new instance of ConsumerService struct
+func NewConsumerService(consumerRepo intefaces.ConsumerRepositoryInterface) *ConsumerService {
 	srv := ConsumerService{
-		consumerRepository: consumerRepository,
+		consumerRepo: consumerRepo,
 	}
 
 	return &srv
 }
 
-// CreateNewCar create a new car
-func (s *ConsumerService) CreateNewConsumer(ctx context.Context, firstName, lastName, email string) (*models.Consumer, error) {
-	consumer, err := models.NewConsumer(firstName, lastName, email, make([]models.Requisition, 0))
+// CreateNewConsumer creates a new consumer
+func (srv *ConsumerService) CreateNewConsumer(ctx context.Context, firstName, lastName, email string) (*models.ConsumerModel, error) {
+	consumer, err := factories.NewConsumerModel(firstName, lastName, email, make([]models.Requisition, 0))
 	if err != nil {
-		return nil, domain.WrapError(errors.New("failed to create a new consumer model"), err)
+		return nil, fmt.Errorf("[domain][consumer][services][CreateNewConsumer] failed to craete a new consumer model: %w", err)
 	}
 
-	consumer, err = s.consumerRepository.Create(ctx, *consumer)
+	consumer, err = srv.consumerRepo.CreateConsumer(ctx, consumer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create a new consumer in the consumer service: %w", err)
+		return nil, fmt.Errorf("[domain][consumer][services][CreateNewConsumer] repository failed to craete a new consumer: %w", err)
 	}
 
 	return consumer, nil

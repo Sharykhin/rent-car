@@ -29,7 +29,6 @@ const (
 )
 
 var (
-	ResourceNotFoundError         = errors.New("resource was not found")
 	RequisitionLimitExceededError = errors.New("requisition limit exceeded")
 	InvalidCarModelError          = errors.New("car model is invalid")
 )

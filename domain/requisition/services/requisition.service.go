@@ -1,13 +1,14 @@
 package services
 
 import (
-	"Sharykhin/rent-car/domain"
-	carModels "Sharykhin/rent-car/domain/car/models"
-	models2 "Sharykhin/rent-car/domain/consumer/models"
-	"Sharykhin/rent-car/domain/requisition/interfaces"
-	"Sharykhin/rent-car/domain/requisition/models"
 	"context"
 	"time"
+
+	"Sharykhin/rent-car/domain"
+	carModels "Sharykhin/rent-car/domain/car/models"
+	consumerModels "Sharykhin/rent-car/domain/consumer/models"
+	"Sharykhin/rent-car/domain/requisition/interfaces"
+	"Sharykhin/rent-car/domain/requisition/models"
 )
 
 type (
@@ -27,7 +28,7 @@ func NewRequisitionService(requisitionRep interfaces.RequisitionRepositoryInterf
 func (srv *RequisitionService) RentCar(ctx context.Context) (*models.Requisition, error) {
 	requisition := models.Requisition{
 		ID: domain.Empty(),
-		Consumer: &models2.Consumer{
+		Consumer: &consumerModels.ConsumerModel{
 			ID:           domain.ID("8403116a-be3c-477d-a198-09f9adcda313"),
 			FirstName:    "",
 			LastName:     "",

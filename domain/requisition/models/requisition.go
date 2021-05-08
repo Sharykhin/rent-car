@@ -10,7 +10,7 @@ import (
 
 type Requisition struct {
 	ID        domain.ID
-	Consumer  *consumerModels.Consumer
+	Consumer  *consumerModels.ConsumerModel
 	Car       *carModels.CarModel
 	DateFrom  time.Time
 	DateTo    time.Time

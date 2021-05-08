@@ -8,6 +8,6 @@ import (
 
 type (
 	ConsumerRepositoryInterface interface {
-		Create(ctx context.Context, consumer models.Consumer) (*models.Consumer, error)
+		CreateConsumer(ctx context.Context, consumer *models.ConsumerModel) (*models.ConsumerModel, error)
 	}
 )

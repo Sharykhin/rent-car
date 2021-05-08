@@ -32,13 +32,13 @@ func (r *CarRepository) CreateCar(ctx context.Context, car *models.CarModel) (*m
 		)
 	}
 
-	nc := models.CarModel{
+	newCar := models.CarModel{
 		ID:        id,
 		Model:     car.Model,
 		CreatedAt: car.CreatedAt,
 	}
 
-	return &nc, nil
+	return &newCar, nil
 }
 
 func (r *CarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error) {
