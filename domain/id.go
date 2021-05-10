@@ -12,6 +12,21 @@ type (
 	ID string
 )
 
+func (id *ID) UnmarshalJSON(b []byte) error {
+	s, err := ParseID(string(b))
+	if err != nil {
+		return NewError(
+			fmt.Errorf("[domain][UnmarshalJSON] id is incorrect: %v", err),
+			ValidationErrorCode,
+			"id is incorrect",
+		)
+	}
+
+	*id = s
+
+	return nil
+}
+
 // String returns string representation of ID
 func (id ID) String() string {
 	return string(id)

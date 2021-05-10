@@ -25,7 +25,17 @@ func NewRequisitionService(requisitionRep interfaces.RequisitionRepositoryInterf
 	return &srv
 }
 
-func (srv *RequisitionService) RentCar(ctx context.Context) (*models.Requisition, error) {
+func (srv *RequisitionService) RentCar(
+	ctx context.Context,
+	carID domain.ID,
+	consumerID domain.ID,
+	startAt time.Time,
+	endAt time.Time,
+) (*models.Requisition, error) {
+	return nil, nil
+}
+
+func (srv *RequisitionService) RentCar2(ctx context.Context) (*models.Requisition, error) {
 	requisition := models.Requisition{
 		ID: domain.Empty(),
 		Consumer: &consumerModels.ConsumerModel{
