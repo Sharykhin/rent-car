@@ -10,7 +10,7 @@ import (
 	"Sharykhin/rent-car/domain/car/types"
 )
 
-// NewCarModel create a new car model with all validation steps
+// NewCarModel creates a new car model with all validation steps
 func NewCarModel(m types.Model) (*models.CarModel, error) {
 	c := models.CarModel{
 		ID:        domain.Empty(),

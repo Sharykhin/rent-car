@@ -2,31 +2,36 @@ package repositories
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/lib/pq"
 
 	"Sharykhin/rent-car/domain/requisition/models"
+	"Sharykhin/rent-car/infrastructure/postgres"
 )
 
 type (
+	// PostgresRequisitionRepository implements requisition repository
 	PostgresRequisitionRepository struct {
-		db *sql.DB
+		conn *postgres.Connection
 	}
 )
 
-// NewPostgresRequisitionRepository is a function constructor that returns a new instance of the consumer repository
-func NewPostgresRequisitionRepository(db *sql.DB) *PostgresRequisitionRepository {
+// NewPostgresRequisitionRepository creates a new instance of requisition repository
+func NewPostgresRequisitionRepository(conn *postgres.Connection) *PostgresRequisitionRepository {
 	repo := PostgresRequisitionRepository{
-		db: db,
+		conn: conn,
 	}
 
 	return &repo
 }
 
-func (repo *PostgresRequisitionRepository) CreateRequisition(ctx context.Context, requisition models.Requisition) (*models.Requisition, error) {
-	_, err := repo.db.ExecContext(
+// CreateRequisition creates a new requisition record
+func (r *PostgresRequisitionRepository) CreateRequisition(
+	ctx context.Context,
+	requisition models.Requisition,
+) (*models.Requisition, error) {
+	_, err := r.conn.DB.ExecContext(
 		ctx,
 		"call rent_car($1, $2, $3, $4)",
 		requisition.Car.ID,
@@ -34,6 +39,7 @@ func (repo *PostgresRequisitionRepository) CreateRequisition(ctx context.Context
 		requisition.DateFrom,
 		requisition.DateTo,
 	)
+	// TODO: Handle overlapping error
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		fmt.Println("pgErr", pqErr)

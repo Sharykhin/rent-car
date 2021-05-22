@@ -8,7 +8,9 @@ import (
 	"Sharykhin/rent-car/domain"
 )
 
-type Model string
+type (
+	Model string
+)
 
 const (
 	Audi Model = "audi"
@@ -21,7 +23,7 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 	var s string
 	err := json.Unmarshal(b, &s)
 	if err != nil {
-		return fmt.Errorf("[domain][car][types][UnmarshalJSON] failed to unmarshal model type: %v", err)
+		return fmt.Errorf("[domain][car][types][Model][UnmarshalJSON] failed to unmarshal model type: %v", err)
 	}
 	model := Model(strings.ToLower(s))
 	switch model {
@@ -31,7 +33,7 @@ func (m *Model) UnmarshalJSON(b []byte) error {
 	}
 
 	return domain.NewError(
-		fmt.Errorf("[domain][car][types][UnmarshalJSON] car model is invalid: %v", m),
+		fmt.Errorf("[domain][car][types][Model][UnmarshalJSON] car model is invalid: %v", m),
 		domain.ValidationErrorCode,
 		"Car model is invalid.",
 	)

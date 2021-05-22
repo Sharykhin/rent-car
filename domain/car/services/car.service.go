@@ -31,12 +31,12 @@ func NewCarService(carRepo intefaces.CarRepositoryInterface) *CarService {
 func (srv *CarService) CreateNewCar(ctx context.Context, m types.Model) (*models.CarModel, error) {
 	car, err := factories.NewCarModel(m)
 	if err != nil {
-		return nil, fmt.Errorf("[domain][car][services][CreateNewCar] failed to create a new car model: %w", err)
+		return nil, fmt.Errorf("[CarService][CreateNewCar] failed to create a new car model: %w", err)
 	}
 
 	car, err = srv.carRepo.CreateCar(ctx, car)
 	if err != nil {
-		return nil, fmt.Errorf("[domain][car][services][CreateNewCar] failed to craete a new car: %w", err)
+		return nil, fmt.Errorf("[CarService][CreateNewCar] repository failed to craete a new car: %w", err)
 	}
 
 	return car, nil
@@ -47,7 +47,7 @@ func (srv *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*models.Ca
 	c, err := srv.carRepo.GetCarByID(ctx, ID)
 
 	if err != nil {
-		return nil, fmt.Errorf("[domain][car][services][CreateNewCar] failed to get a car from the car service: %w", err)
+		return nil, fmt.Errorf("[CarService][GetCarByID] failed to get a car from the car repository: %w", err)
 	}
 
 	return c, err

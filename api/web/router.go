@@ -17,13 +17,6 @@ import (
 )
 
 func router() http.Handler {
-	// TODO: move it into the server
-	// TODO: check whether lorgus works across the whole app with log level on top
-	db, err := postgres.Connect(os.Getenv("POSTGRES_URL"))
-	if err != nil {
-		log.Fatalf("failed to connect to postgres: %v", err)
-	}
-
 	r := mux.NewRouter()
 
 	r.HandleFunc("/_healthcheck", func(w http.ResponseWriter, r *http.Request) {

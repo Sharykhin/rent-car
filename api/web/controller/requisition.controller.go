@@ -11,10 +11,13 @@ import (
 )
 
 type (
+	// RequisitionController handles incoming http request
+	// and describes API around requisition
 	RequisitionController struct {
 		requisitionSrv *services.RequisitionService
 	}
 
+	// CreateRequisitionPayload is a request body for creating a new requisition
 	CreateRequisitionPayload struct {
 		CarID      domain.ID   `json:"car_id"`
 		ConsumerID domain.ID   `json:"consumer_id"`
@@ -23,6 +26,7 @@ type (
 	}
 )
 
+// NewRequisitionController is a function constructor that creates a new instance of requisition controller
 func NewRequisitionController(requisitionSrv *services.RequisitionService) *RequisitionController {
 	ctrl := RequisitionController{
 		requisitionSrv: requisitionSrv,

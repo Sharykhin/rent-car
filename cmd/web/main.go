@@ -10,21 +10,24 @@ import (
 )
 
 func main() {
-	l, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("failed to parse log level env variable")
+		log.Fatalf("[web][main] failed to load .env file: %v", err)
 	}
-	log.SetLevel(l)
 
-	err = godotenv.Load()
+	level, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
 	if err != nil {
-		log.Fatal("Failed to load .env file")
+		log.Fatalf("[web][main] failed to parse a log level env variable: %v", err)
 	}
+	log.SetLevel(level)
+	logger := log.WithField("service", os.Getenv("SERVICE_ID"))
 
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
-		log.Fatal("Environment variable SERVER_PORT is not defined")
+		log.Fatal("[web][main] environment variable SERVER_PORT is not defined")
 	}
 
-	web.Start(serverPort)
+	server := web.NewServer(serverPort, logger)
+
+	server.ListenAndServe()
 }
