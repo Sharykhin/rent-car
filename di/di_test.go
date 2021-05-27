@@ -14,12 +14,12 @@ func init() {
 }
 
 func TestInit(t *testing.T) {
-	_, err := Init()
+	err := Init()
 	if err != nil {
 		t.Fatalf("expected err nil but got %v", err)
 	}
 
-	_, err = Init()
+	err = Init()
 
 	if err != AlreadyInitializedError {
 		t.Fatalf("expected err %v but got %v", AlreadyInitializedError, err)

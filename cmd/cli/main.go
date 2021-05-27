@@ -1,6 +1,8 @@
 package main
 
 import (
+	"Sharykhin/rent-car/infrastructure/postgres/query"
+	"context"
 	"fmt"
 	"log"
 
@@ -16,12 +18,16 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	container, err := di.Init()
+	err = di.Init()
 	if err != nil {
 		log.Fatalf("failed to initialize di container: %v", err)
 	}
-	postgres := container.PostgresConn
+	postgres := di.Container.PostgresConn
 	err = postgres.Connect()
+	defer postgres.Close()
 
-	fmt.Println(err)
+	carQueryRepository := query.NewPostgresCarQuery(postgres)
+	cars, total, err := carQueryRepository.GetPagedCarsList(context.TODO(), 2, 0)
+
+	fmt.Println(cars, total, err)
 }

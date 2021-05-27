@@ -53,6 +53,7 @@ func NewID() ID {
 	return ID(guid.String())
 }
 
+// TODO: @improve rename to NewEmptyID cause just Empty under domain package is not clear what it means
 func Empty() ID {
 	return ID("")
 }

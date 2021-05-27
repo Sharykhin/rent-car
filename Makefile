@@ -11,7 +11,7 @@ web:
 	LOG_LEVEL=debug go run cmd/web/main.go
 
 test:
-	go run cmd/cli/main.go
+	LOG_LEVEL=debug go run cmd/cli/main.go
 
 migrate-create:
 	docker run -v ${current_dir}/db/migrations:/db/migrations migrate/migrate create -ext sql -dir db/migrations -seq $(name)
