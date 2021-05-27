@@ -9,6 +9,7 @@ import (
 	"Sharykhin/rent-car/domain"
 )
 
+// JsonMiddleware checks that incoming request has content-type header that equals application/json
 func JsonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -18,7 +19,7 @@ func JsonMiddleware(next http.Handler) http.Handler {
 			response.Fail(
 				w,
 				domain.NewError(
-					errors.New("Content-type must be application/json."),
+					errors.New("content-type must be application/json"),
 					domain.ValidationErrorCode,
 					"Content-type must be application/json.",
 				))

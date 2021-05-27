@@ -1,13 +1,13 @@
 package response
 
 import (
-	"Sharykhin/rent-car/api/web/util"
 	"encoding/json"
 	"errors"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
 
+	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
 )
 
@@ -26,6 +26,7 @@ type (
 	}
 )
 
+// Success returns a success response with status code 200
 func Success(w http.ResponseWriter, data interface{}, meta interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -45,6 +46,7 @@ func Success(w http.ResponseWriter, data interface{}, meta interface{}) {
 
 }
 
+// Created returns a success response with status code 200
 func Created(w http.ResponseWriter, data interface{}, meta interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -64,6 +66,7 @@ func Created(w http.ResponseWriter, data interface{}, meta interface{}) {
 
 }
 
+// Fail returns a response as failed and status code is calculated based on provided error
 func Fail(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	var domainErr *domain.Error
@@ -79,6 +82,7 @@ func Fail(w http.ResponseWriter, err error) {
 	asDomainError(w, err.Error(), domain.InternalServerErrorCode, err)
 }
 
+// asNativeError translates non-domain errors into web
 func asNativeError(w http.ResponseWriter, status int, msg string, code domain.Code, origin error) {
 	switch status {
 	case http.StatusInternalServerError:
@@ -95,6 +99,7 @@ func asNativeError(w http.ResponseWriter, status int, msg string, code domain.Co
 	sendErrorResponse(w, &r)
 }
 
+// asDomainError translates domain error into web
 func asDomainError(w http.ResponseWriter, message string, code domain.Code, origin error) {
 	switch code {
 	case domain.ResourceNotFoundErrorCode:
@@ -115,6 +120,7 @@ func asDomainError(w http.ResponseWriter, message string, code domain.Code, orig
 	sendErrorResponse(w, &r)
 }
 
+// sendErrorResponse returns error response
 func sendErrorResponse(w http.ResponseWriter, r *errorResponse) {
 	err := json.NewEncoder(w).Encode(&r)
 	if err != nil {

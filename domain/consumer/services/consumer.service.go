@@ -29,12 +29,12 @@ func NewConsumerService(consumerRepo intefaces.ConsumerRepositoryInterface) *Con
 func (srv *ConsumerService) CreateNewConsumer(ctx context.Context, firstName, lastName, email string) (*models.ConsumerModel, error) {
 	consumer, err := factories.NewConsumerModel(firstName, lastName, email, make([]models.Requisition, 0))
 	if err != nil {
-		return nil, fmt.Errorf("[domain][consumer][services][CreateNewConsumer] failed to craete a new consumer model: %w", err)
+		return nil, fmt.Errorf("[ConsumerService][CreateNewConsumer] failed to craete a new consumer model: %w", err)
 	}
 
 	consumer, err = srv.consumerRepo.CreateConsumer(ctx, consumer)
 	if err != nil {
-		return nil, fmt.Errorf("[domain][consumer][services][CreateNewConsumer] repository failed to craete a new consumer: %w", err)
+		return nil, fmt.Errorf("[ConsumerService][CreateNewConsumer] repository failed to craete a new consumer: %w", err)
 	}
 
 	return consumer, nil

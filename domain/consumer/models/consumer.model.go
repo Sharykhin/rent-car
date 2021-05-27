@@ -4,10 +4,9 @@ import (
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
 )
 
-// ConsumerModel is a person/organization who/what rents cars
+// ConsumerModel is a person who rents a car
 type ConsumerModel struct {
 	ID           domain.ID
 	FirstName    string
@@ -15,15 +14,4 @@ type ConsumerModel struct {
 	Email        string
 	CreatedAt    time.Time
 	Requisitions []Requisition
-}
-
-func (cs *ConsumerModel) RentCar(c *models.CarModel) error {
-	if len(cs.Requisitions) > 2 {
-		return domain.RequisitionLimitExceededError
-	}
-
-	requisition := NewRequisition(c)
-	cs.Requisitions = append(cs.Requisitions, *requisition)
-
-	return nil
 }

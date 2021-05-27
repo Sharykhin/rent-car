@@ -55,15 +55,13 @@ func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.NewError(
-				fmt.Errorf("[PostgresCarRepository][CreateCar] failed to find a car in the database: %v", err),
+				fmt.Errorf("[PostgresCarRepository][GetCarByID] failed to find a car in the database: %v", err),
 				domain.ResourceNotFoundErrorCode,
 				"Car resource was not found.",
 			)
 		}
 
-		return nil, domain.NewInternalError(
-			fmt.Errorf("[PostgresCarRepository][CreateCar] failed to find a car in the database: %v", err),
-		)
+		return nil, fmt.Errorf("[PostgresCarRepository][GetCarByID] failed to find a car in the database: %v", err)
 	}
 
 	return &c, nil

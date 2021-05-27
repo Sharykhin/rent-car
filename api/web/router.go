@@ -1,19 +1,12 @@
 package web
 
 import (
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 
-	"Sharykhin/rent-car/api/web/controller"
 	"Sharykhin/rent-car/api/web/middleware"
-	carSrvs "Sharykhin/rent-car/domain/car/services"
-	consumerSrvs "Sharykhin/rent-car/domain/consumer/services"
-	"Sharykhin/rent-car/domain/requisition/services"
-	"Sharykhin/rent-car/infrastructure/postgres"
-	"Sharykhin/rent-car/infrastructure/postgres/repositories"
+	"Sharykhin/rent-car/di"
 )
 
 func router() http.Handler {
@@ -25,30 +18,16 @@ func router() http.Handler {
 	}).Methods("GET")
 
 	sr := r.PathPrefix("/v1").Subrouter()
-	sr.Use(middleware.LoggingMiddleware, middleware.JsonMiddleware)
+	sr.Use(middleware.LoggingMiddleware(di.Container.Logger), middleware.JsonMiddleware)
 
-	carController := controller.NewCarController(
-		carSrvs.NewCarService(
-			repositories.NewCarRepository(db),
-		),
-	)
-	consumerController := controller.NewConsumerController(
-		consumerSrvs.NewConsumerService(
-			repositories.NewConsumerRepository(db),
-		),
-	)
-	requisitionCtrl := controller.NewRequisitionController(
-		services.NewRequisitionService(
-			repositories.NewPostgresRequisitionRepository(
-				db,
-			),
-		),
-	)
+	carController := di.Container.CarController
+	consumerController := di.Container.ConsumerController
+	requisitionController := di.Container.RequisitionController
 
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")
 	sr.HandleFunc("/consumers", consumerController.CreateConsumer).Methods("POST")
-	sr.HandleFunc("/requisitions", requisitionCtrl.CreateRequisition).Methods("POST")
+	sr.HandleFunc("/requisitions", requisitionController.CreateRequisition).Methods("POST")
 
 	return r
 }
