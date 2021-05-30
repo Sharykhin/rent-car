@@ -11,7 +11,7 @@ func NewIsCarModelCorrectSpecification(car *models.CarModel) error {
 	isCarModelEmpty := car.Model == ""
 	if isCarModelEmpty {
 		return domain.NewError(
-			errors.New("[domain][car][specifications][NewIsCarModelCorrectSpecification] car model is empty"),
+			errors.New("[car][NewIsCarModelCorrectSpecification] car model is empty"),
 			domain.ValidationErrorCode,
 			"Car model is required.",
 		)
