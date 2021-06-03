@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	// CarRepositoryInterface represents car repository methods
+	// CarRepositoryInterface describes car repository methods
 	CarRepositoryInterface interface {
 		CreateCar(ctx context.Context, c *models.CarModel) (*models.CarModel, error)
 		GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error)

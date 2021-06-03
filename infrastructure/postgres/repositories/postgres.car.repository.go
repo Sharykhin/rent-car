@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
@@ -15,6 +16,11 @@ type (
 	PostgresCarRepository struct {
 		conn *postgres.Connection
 	}
+)
+
+var (
+	// ErrCarNotFound describes error when car was not found
+	ErrCarNotFound = errors.New("car was not found")
 )
 
 // NewPostgresCarRepository creates a new car repository instance
@@ -46,7 +52,7 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *models.CarMo
 	return &newCar, nil
 }
 
-// GetCarByID returns a car model by its ID
+// GetCarByID returns a car by its ID
 func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error) {
 	c := models.CarModel{}
 	stmt := `select id, model, created_at from public.cars where id = $1`
@@ -55,7 +61,7 @@ func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.NewError(
-				fmt.Errorf("[PostgresCarRepository][GetCarByID] failed to find a car in the database: %v", err),
+				fmt.Errorf("[PostgresCarRepository][GetCarByID] %w", ErrCarNotFound),
 				domain.ResourceNotFoundErrorCode,
 				"Car resource was not found.",
 			)

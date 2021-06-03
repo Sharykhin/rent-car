@@ -1,11 +1,11 @@
-package services
+package service
 
 import (
 	"context"
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/factories"
+	"Sharykhin/rent-car/domain/car/factory"
 	"Sharykhin/rent-car/domain/car/intefaces"
 	"Sharykhin/rent-car/domain/car/models"
 	"Sharykhin/rent-car/domain/car/types"
@@ -18,7 +18,7 @@ type (
 	}
 )
 
-// NewCarService is function constructor that returns a new instance of car service
+// NewCarService creates a new car service instance
 func NewCarService(carRepo intefaces.CarRepositoryInterface) *CarService {
 	srv := CarService{
 		carRepo: carRepo,
@@ -28,15 +28,15 @@ func NewCarService(carRepo intefaces.CarRepositoryInterface) *CarService {
 }
 
 // CreateNewCar creates a new car
-func (srv *CarService) CreateNewCar(ctx context.Context, m types.Model) (*models.CarModel, error) {
-	car, err := factories.NewCarModel(m)
+func (srv *CarService) CreateNewCar(ctx context.Context, model types.Model) (*models.CarModel, error) {
+	car, err := factory.NewCarModel(model)
 	if err != nil {
-		return nil, fmt.Errorf("[CarService][CreateNewCar] failed to create a new car model: %w", err)
+		return nil, fmt.Errorf("[domain][car][CarService][CreateNewCar] failed to create a new car model: %w", err)
 	}
 
 	car, err = srv.carRepo.CreateCar(ctx, car)
 	if err != nil {
-		return nil, fmt.Errorf("[CarService][CreateNewCar] repository failed to craete a new car: %w", err)
+		return nil, fmt.Errorf("[domain][car][CarService][CreateNewCar] repository failed to craete a new car: %w", err)
 	}
 
 	return car, nil

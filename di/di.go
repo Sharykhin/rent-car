@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"Sharykhin/rent-car/api/web/controller"
-	carServices "Sharykhin/rent-car/domain/car/services"
+	carService "Sharykhin/rent-car/domain/car/service"
 	consumerServices "Sharykhin/rent-car/domain/consumer/services"
 	requisitionServices "Sharykhin/rent-car/domain/requisition/services"
 	"Sharykhin/rent-car/infrastructure/postgres"
@@ -27,7 +27,7 @@ type (
 		PostgresCarRepository         *postgresRepos.PostgresCarRepository
 		PostgresConsumerRepository    *postgresRepos.PostgresConsumerRepository
 		PostgresRequisitionRepository *postgresRepos.PostgresRequisitionRepository
-		CarService                    *carServices.CarService
+		CarService                    *carService.CarService
 		ConsumerService               *consumerServices.ConsumerService
 		RequisitionService            *requisitionServices.RequisitionService
 		CarController                 *controller.CarController
@@ -53,11 +53,11 @@ func Init() error {
 	postgresConsumerRepository := postgresRepos.NewPostgresConsumerRepository(postgresConn)
 	postgresRequisitionRepository := postgresRepos.NewPostgresRequisitionRepository(postgresConn)
 
-	carService := carServices.NewCarService(postgresCarRepository)
+	carSrv := carService.NewCarService(postgresCarRepository)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository)
 	requisitionService := requisitionServices.NewRequisitionService(postgresRequisitionRepository)
 
-	carController := controller.NewCarController(carService)
+	carController := controller.NewCarController(carSrv)
 	consumerController := controller.NewConsumerController(consumerService)
 	requisitionController := controller.NewRequisitionController(requisitionService)
 
@@ -74,7 +74,7 @@ func Init() error {
 		PostgresCarRepository:         postgresCarRepository,
 		PostgresConsumerRepository:    postgresConsumerRepository,
 		PostgresRequisitionRepository: postgresRequisitionRepository,
-		CarService:                    carService,
+		CarService:                    carSrv,
 		ConsumerService:               consumerService,
 		RequisitionService:            requisitionService,
 		CarController:                 carController,

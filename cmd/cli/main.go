@@ -1,8 +1,13 @@
 package main
 
 import (
+	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car/factory"
+	"Sharykhin/rent-car/domain/car/specifications"
 	"Sharykhin/rent-car/infrastructure/postgres/query"
+	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -30,4 +35,12 @@ func main() {
 	cars, total, err := carQueryRepository.GetPagedCarsList(context.TODO(), 2, 0)
 
 	fmt.Println(cars, total, err)
+
+	car, err := factory.NewCarModel("")
+
+	fmt.Println(err, car, errors.Is(err, specification.ErrCarModelRequired))
+
+	car, err = di.Container.PostgresCarRepository.GetCarByID(context.Background(), domain.ID("d92b94c8-6d3f-4663-b5da-f61c653eb898"))
+	fmt.Println(car, err, errors.Is(err, repositories.ErrCarNotFound))
+
 }

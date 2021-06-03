@@ -8,15 +8,16 @@ import (
 	"Sharykhin/rent-car/domain/car/types"
 )
 
-// CarModel represents a car that consumers will rent
-type CarModel struct {
-	ID        domain.ID   `json:"id"`
-	Model     types.Model `json:"model"`
-	CreatedAt time.Time   `json:"created_at"`
-}
+type (
+	// CarModel represents a car that consumers will rent
+	CarModel struct {
+		ID        domain.ID   `json:"id"`
+		Model     types.Model `json:"model"`
+		CreatedAt time.Time   `json:"created_at"`
+	}
+)
 
-// MarshalJSON implements Marshaler interface to represent
-// car model into json format.
+// MarshalJSON implements Marshaler interface to represent car model into json format
 func (c *CarModel) MarshalJSON() ([]byte, error) {
 	type Alias CarModel
 

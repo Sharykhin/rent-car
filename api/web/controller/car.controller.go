@@ -6,14 +6,14 @@ import (
 	"Sharykhin/rent-car/api/web/response"
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/services"
+	"Sharykhin/rent-car/domain/car/service"
 	"Sharykhin/rent-car/domain/car/types"
 )
 
 type (
 	// CarController is a web controller that handles API requests around car domain model
 	CarController struct {
-		carSrv *services.CarService
+		carService *service.CarService
 	}
 
 	// CreateCarPayload this is a request body for creating a new car
@@ -22,9 +22,9 @@ type (
 	}
 )
 
-func NewCarController(carSrv *services.CarService) *CarController {
+func NewCarController(carSrv *service.CarService) *CarController {
 	ctrl := CarController{
-		carSrv: carSrv,
+		carService: carSrv,
 	}
 
 	return &ctrl
@@ -39,7 +39,7 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, err := ctrl.carSrv.CreateNewCar(r.Context(), payload.Model)
+	c, err := ctrl.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
 		response.Fail(w, err)
 		return
@@ -51,7 +51,7 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	ID := getUrlParam(r, "id")
 
-	c, err := ctrl.carSrv.GetCarByID(r.Context(), domain.ID(ID))
+	c, err := ctrl.carService.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
 		response.Fail(w, err)

@@ -1,4 +1,4 @@
-package factories
+package factory
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/models"
-	"Sharykhin/rent-car/domain/car/specifications"
+	"Sharykhin/rent-car/domain/car/specification"
 	"Sharykhin/rent-car/domain/car/types"
 )
 
@@ -18,9 +18,9 @@ func NewCarModel(m types.Model) (*models.CarModel, error) {
 		CreatedAt: time.Now().UTC(),
 	}
 
-	err := specifications.NewIsCarModelCorrectSpecification(&c)
+	err := specification.IsCarModelCorrectSpecification(&c)
 	if err != nil {
-		return nil, fmt.Errorf("[domain][factories][NewCarModel] failed to create a new car model: %w", err)
+		return nil, fmt.Errorf("[domain][car][factory][NewCarModel] failed to create a new car model: %w", err)
 	}
 
 	return &c, nil
