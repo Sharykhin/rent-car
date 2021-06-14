@@ -3,12 +3,12 @@ package response
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
-
-	log "github.com/sirupsen/logrus"
 
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/logger"
 )
 
 type (
@@ -36,7 +36,7 @@ func Success(w http.ResponseWriter, data interface{}, meta interface{}) {
 	}
 	err := json.NewEncoder(w).Encode(&r)
 	if err != nil {
-		log.Printf("failed to encode http response: %v", err)
+		logger.Log.Printf("failed to encode http response: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err = w.Write([]byte("Internal Server Error"))
 		if err != nil {
@@ -86,7 +86,7 @@ func Fail(w http.ResponseWriter, err error) {
 func asNativeError(w http.ResponseWriter, status int, msg string, code domain.Code, origin error) {
 	switch status {
 	case http.StatusInternalServerError:
-		log.Error(origin)
+		logger.Log.Error(origin)
 	}
 
 	w.WriteHeader(status)
@@ -105,9 +105,10 @@ func asDomainError(w http.ResponseWriter, message string, code domain.Code, orig
 	case domain.ResourceNotFoundErrorCode:
 		w.WriteHeader(http.StatusNotFound)
 	case domain.ValidationErrorCode:
+		logger.Log.Info(origin)
 		w.WriteHeader(http.StatusBadRequest)
 	default:
-		log.Error(origin)
+		logger.Log.Error(origin)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 

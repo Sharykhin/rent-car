@@ -7,8 +7,8 @@ import (
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/factory"
 	"Sharykhin/rent-car/domain/car/intefaces"
-	"Sharykhin/rent-car/domain/car/models"
-	"Sharykhin/rent-car/domain/car/types"
+	"Sharykhin/rent-car/domain/car/model"
+	"Sharykhin/rent-car/domain/car/value"
 )
 
 type (
@@ -28,7 +28,7 @@ func NewCarService(carRepo intefaces.CarRepositoryInterface) *CarService {
 }
 
 // CreateNewCar creates a new car
-func (srv *CarService) CreateNewCar(ctx context.Context, model types.Model) (*models.CarModel, error) {
+func (srv *CarService) CreateNewCar(ctx context.Context, model value.Model) (*model.CarModel, error) {
 	car, err := factory.NewCarModel(model)
 	if err != nil {
 		return nil, fmt.Errorf("[domain][car][CarService][CreateNewCar] failed to create a new car model: %w", err)
@@ -43,7 +43,7 @@ func (srv *CarService) CreateNewCar(ctx context.Context, model types.Model) (*mo
 }
 
 // GetCarByID returns a specific car by its ID
-func (srv *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error) {
+func (srv *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*model.CarModel, error) {
 	c, err := srv.carRepo.GetCarByID(ctx, ID)
 
 	if err != nil {

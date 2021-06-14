@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -28,10 +27,7 @@ const (
 	ResourceNotFoundErrorCode      = "RESOURCE_NOT_FOUND"
 )
 
-var (
-	RequisitionLimitExceededError = errors.New("requisition limit exceeded")
-)
-
+// NewError creates a new domain error with corresponding code and semantical message
 func NewError(err error, code Code, message string) *Error {
 	return &Error{
 		Code:    code,
@@ -40,6 +36,7 @@ func NewError(err error, code Code, message string) *Error {
 	}
 }
 
+// NewInternalError creates domain internal server error
 func NewInternalError(err error) *Error {
 	return NewError(err, InternalServerErrorCode, "Something went wrong")
 }

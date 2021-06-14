@@ -8,7 +8,7 @@ import (
 	"Sharykhin/rent-car/api/web/controller"
 	carService "Sharykhin/rent-car/domain/car/service"
 	consumerServices "Sharykhin/rent-car/domain/consumer/services"
-	requisitionServices "Sharykhin/rent-car/domain/requisition/services"
+	requisitionService "Sharykhin/rent-car/domain/requisition/service"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	postgresRepos "Sharykhin/rent-car/infrastructure/postgres/repositories"
 	log "github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ type (
 		PostgresRequisitionRepository *postgresRepos.PostgresRequisitionRepository
 		CarService                    *carService.CarService
 		ConsumerService               *consumerServices.ConsumerService
-		RequisitionService            *requisitionServices.RequisitionService
+		RequisitionService            *requisitionService.RequisitionService
 		CarController                 *controller.CarController
 		ConsumerController            *controller.ConsumerController
 		RequisitionController         *controller.RequisitionController
@@ -55,11 +55,11 @@ func Init() error {
 
 	carSrv := carService.NewCarService(postgresCarRepository)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository)
-	requisitionService := requisitionServices.NewRequisitionService(postgresRequisitionRepository)
+	requisitionSrv := requisitionService.NewRequisitionService(postgresRequisitionRepository)
 
 	carController := controller.NewCarController(carSrv)
 	consumerController := controller.NewConsumerController(consumerService)
-	requisitionController := controller.NewRequisitionController(requisitionService)
+	requisitionController := controller.NewRequisitionController(requisitionSrv)
 
 	// TODO: @improve set json formatter and rename msg to message and time to timestamp
 	level, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
@@ -76,7 +76,7 @@ func Init() error {
 		PostgresRequisitionRepository: postgresRequisitionRepository,
 		CarService:                    carSrv,
 		ConsumerService:               consumerService,
-		RequisitionService:            requisitionService,
+		RequisitionService:            requisitionSrv,
 		CarController:                 carController,
 		ConsumerController:            consumerController,
 		RequisitionController:         requisitionController,

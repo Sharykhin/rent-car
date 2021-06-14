@@ -1,18 +1,18 @@
-package models
+package model
 
 import (
 	"encoding/json"
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/types"
+	"Sharykhin/rent-car/domain/car/value"
 )
 
 type (
 	// CarModel represents a car that consumers will rent
 	CarModel struct {
 		ID        domain.ID   `json:"id"`
-		Model     types.Model `json:"model"`
+		Model     value.Model `json:"model"`
 		CreatedAt time.Time   `json:"created_at"`
 	}
 )

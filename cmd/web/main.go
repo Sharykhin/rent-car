@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Sharykhin/rent-car/logger"
 	"log"
 	"os"
 
@@ -16,6 +17,11 @@ func main() {
 		log.Fatalf("[web][main] failed to load .env file: %v", err)
 	}
 
+	err = logger.Init()
+	if err != nil {
+		log.Fatalf("[web][main] failed to initialize logger: %v", err)
+	}
+
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		log.Fatal("[web][main] environment variable SERVER_PORT is not defined")
@@ -23,7 +29,7 @@ func main() {
 
 	err = di.Init()
 	if err != nil {
-		log.Fatalf("[web][main] failed to initialize di")
+		log.Fatalf("[web][main] failed to initialize di: %v", err)
 	}
 
 	server := web.NewServer(serverPort)

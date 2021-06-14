@@ -3,7 +3,7 @@ package main
 import (
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/factory"
-	"Sharykhin/rent-car/domain/car/specifications"
+	"Sharykhin/rent-car/domain/car/specification"
 	"Sharykhin/rent-car/infrastructure/postgres/query"
 	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 	"context"

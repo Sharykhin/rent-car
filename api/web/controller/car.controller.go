@@ -7,7 +7,7 @@ import (
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/service"
-	"Sharykhin/rent-car/domain/car/types"
+	"Sharykhin/rent-car/domain/car/value"
 )
 
 type (
@@ -18,7 +18,7 @@ type (
 
 	// CreateCarPayload this is a request body for creating a new car
 	CreateCarPayload struct {
-		Model types.Model `json:"model"`
+		Model value.Model `json:"model"`
 	}
 )
 

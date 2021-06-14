@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car/model"
 	"Sharykhin/rent-car/infrastructure/postgres"
 )
 
@@ -33,7 +33,7 @@ func NewPostgresCarRepository(conn *postgres.Connection) *PostgresCarRepository 
 }
 
 // CreateCar creates a new car
-func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *models.CarModel) (*models.CarModel, error) {
+func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarModel) (*model.CarModel, error) {
 	var id domain.ID
 	stmt := `insert into public.cars(model, created_at) values($1, $2) returning id`
 	err := r.conn.DB.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
@@ -43,7 +43,7 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *models.CarMo
 		)
 	}
 
-	newCar := models.CarModel{
+	newCar := model.CarModel{
 		ID:        id,
 		Model:     car.Model,
 		CreatedAt: car.CreatedAt,
@@ -53,8 +53,8 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *models.CarMo
 }
 
 // GetCarByID returns a car by its ID
-func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*models.CarModel, error) {
-	c := models.CarModel{}
+func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*model.CarModel, error) {
+	c := model.CarModel{}
 	stmt := `select id, model, created_at from public.cars where id = $1`
 	err := r.conn.DB.QueryRowContext(ctx, stmt, ID).Scan(&c.ID, &c.Model, &c.CreatedAt)
 

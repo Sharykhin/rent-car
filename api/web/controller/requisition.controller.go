@@ -7,14 +7,14 @@ import (
 	"Sharykhin/rent-car/api/web/response"
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/requisition/services"
+	"Sharykhin/rent-car/domain/requisition/service"
 )
 
 type (
 	// RequisitionController handles incoming http request
 	// and describes API around requisition
 	RequisitionController struct {
-		requisitionSrv *services.RequisitionService
+		requisitionSrv *service.RequisitionService
 	}
 
 	// CreateRequisitionPayload is a request body for creating a new requisition
@@ -27,7 +27,7 @@ type (
 )
 
 // NewRequisitionController is a function constructor that creates a new instance of requisition controller
-func NewRequisitionController(requisitionSrv *services.RequisitionService) *RequisitionController {
+func NewRequisitionController(requisitionSrv *service.RequisitionService) *RequisitionController {
 	ctrl := RequisitionController{
 		requisitionSrv: requisitionSrv,
 	}

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	carModels "Sharykhin/rent-car/domain/car/models"
+	carModels "Sharykhin/rent-car/domain/car/model"
 	consumerModels "Sharykhin/rent-car/domain/consumer/models"
 )
 

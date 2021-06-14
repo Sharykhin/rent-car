@@ -2,15 +2,15 @@ package models
 
 import (
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car/model"
 )
 
 type Requisition struct {
 	ID  domain.ID
-	Car *models.CarModel
+	Car *model.CarModel
 }
 
-func NewRequisition(c *models.CarModel) *Requisition {
+func NewRequisition(c *model.CarModel) *Requisition {
 	requisition := Requisition{
 		ID:  domain.Empty(),
 		Car: c,

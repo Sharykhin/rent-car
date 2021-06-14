@@ -1,11 +1,12 @@
-package services
+package service
 
 import (
 	"context"
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	carModels "Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car/intefaces"
+	carModels "Sharykhin/rent-car/domain/car/model"
 	consumerModels "Sharykhin/rent-car/domain/consumer/models"
 	"Sharykhin/rent-car/domain/requisition/interfaces"
 	"Sharykhin/rent-car/domain/requisition/models"
@@ -14,6 +15,7 @@ import (
 type (
 	RequisitionService struct {
 		requisitionRepo interfaces.RequisitionRepositoryInterface
+		carRepo         intefaces.CarRepositoryInterface
 	}
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/models"
+	"Sharykhin/rent-car/domain/car/model"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 )
 
 // IsCarModelCorrectSpecification checks whether car model is correct
-func IsCarModelCorrectSpecification(car *models.CarModel) error {
+func IsCarModelCorrectSpecification(car *model.CarModel) error {
 	isCarModelEmpty := car.Model == ""
 	if isCarModelEmpty {
 		return domain.NewError(
