@@ -1,4 +1,4 @@
-package intefaces
+package service
 
 import (
 	"context"

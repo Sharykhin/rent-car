@@ -39,7 +39,8 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarMod
 	err := r.conn.DB.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
 	if err != nil {
 		return nil, domain.NewInternalError(
-			fmt.Errorf("[PostgresCarRepository][CreateCar] failed to insert a new car record into cars table: %v", err),
+			fmt.Errorf("failed to insert a new car record into cars table: %v", err),
+			"[infrastructure][postgres][repositories][PostgresCarRepository][CreateCar]",
 		)
 	}
 
@@ -61,13 +62,16 @@ func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.NewError(
-				fmt.Errorf("[PostgresCarRepository][GetCarByID] %w", ErrCarNotFound),
+				ErrCarNotFound,
+				"[infrastructure][postgres][repositories][PostgresCarRepository][GetCarByID]",
 				domain.ResourceNotFoundErrorCode,
-				"Car resource was not found.",
 			)
 		}
 
-		return nil, fmt.Errorf("[PostgresCarRepository][GetCarByID] failed to find a car in the database: %v", err)
+		return nil, domain.NewInternalError(
+			fmt.Errorf("failed to find a car in a database: %v", err),
+			"[infrastructure][postgres][repositories][PostgresCarRepository][GetCarByID]",
+		)
 	}
 
 	return &c, nil

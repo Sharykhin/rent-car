@@ -16,9 +16,9 @@ func (id *ID) UnmarshalJSON(b []byte) error {
 	s, err := ParseID(string(b))
 	if err != nil {
 		return NewError(
-			fmt.Errorf("[domain][UnmarshalJSON] id is incorrect: %v", err),
+			fmt.Errorf("id is incorrect: %v", err),
+			"[domain][ID][UnmarshalJSON]",
 			ValidationErrorCode,
-			"id is incorrect",
 		)
 	}
 

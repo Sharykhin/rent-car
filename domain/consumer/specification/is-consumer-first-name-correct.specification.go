@@ -7,20 +7,32 @@ import (
 	"Sharykhin/rent-car/domain/consumer/models"
 )
 
+const (
+	firstNameMaxLength = 50
+)
+
 var (
-	ErrConsumerFirstNameRequired = errors.New("[consumer][IsConsumerFirstNameCorrectSpecification] first name is empty")
-	ErrConsumerFirstNameTooLong  = errors.New("[consumer][IsConsumerFirstNameCorrectSpecification] first name is too long")
+	ErrConsumerFirstNameRequired = errors.New("first name is empty")
+	ErrConsumerFirstNameTooLong  = errors.New("first name is too long")
 )
 
 // IsConsumerFirstNameCorrectSpecification validates consumer last name
 func IsConsumerFirstNameCorrectSpecification(consumer *models.ConsumerModel) error {
-	isEmpty := consumer.FirstName == ""
-	if isEmpty {
-		return domain.NewError(ErrConsumerFirstNameRequired, domain.ValidationErrorCode, "first name is required")
+	isFirstNameEmpty := consumer.FirstName == ""
+	if isFirstNameEmpty {
+		return domain.NewError(
+			ErrConsumerFirstNameRequired,
+			"[domain][consumer][specification][IsConsumerFirstNameCorrectSpecification]",
+			domain.ValidationErrorCode,
+		)
 	}
 
-	if len(consumer.FirstName) > 50 {
-		return domain.NewError(ErrConsumerFirstNameTooLong, domain.ValidationErrorCode, "first name is too long")
+	if len(consumer.FirstName) > firstNameMaxLength {
+		return domain.NewError(
+			ErrConsumerFirstNameTooLong,
+			"[domain][consumer][specification][IsConsumerFirstNameCorrectSpecification]",
+			domain.ValidationErrorCode,
+		)
 	}
 
 	return nil

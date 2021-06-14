@@ -44,15 +44,16 @@ func (r *PostgresConsumerRepository) CreateConsumer(
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == constraintUniqueCode {
 			return nil, domain.NewError(
-				fmt.Errorf(
-					"[PostgresConsumerRepository][CreateConsumer] failed to insert a new record into consumers table: %v",
-					err,
-				),
+				fmt.Errorf("failed to insert a new record into consumers table: %v", err),
+				"[infrastructure][postgres][repositories][PostgresConsumerRepository][CreateConsumer]",
 				domain.ValidationErrorCode,
-				"Email is duplicated.",
 			)
 		}
-		return nil, fmt.Errorf("[PostgresConsumerRepository][CreateConsumer] failed to insert a new record into consumers table: %v", err)
+
+		return nil, domain.NewInternalError(
+			fmt.Errorf("failed to insert a new record into consumers table: %v", err),
+			"[infrastructure][postgres][repositories][PostgresConsumerRepository][CreateConsumer]",
+		)
 	}
 
 	newConsumer := models.ConsumerModel{

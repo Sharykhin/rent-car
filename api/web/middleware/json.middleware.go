@@ -20,8 +20,8 @@ func JsonMiddleware(next http.Handler) http.Handler {
 				w,
 				domain.NewError(
 					errors.New("content-type must be application/json"),
+					"[api][web][middleware][JsonMiddleware]",
 					domain.ValidationErrorCode,
-					"Content-type must be application/json.",
 				))
 			return
 		}

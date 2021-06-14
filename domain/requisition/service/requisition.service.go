@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/intefaces"
 	carModels "Sharykhin/rent-car/domain/car/model"
+	"Sharykhin/rent-car/domain/car/service"
 	consumerModels "Sharykhin/rent-car/domain/consumer/models"
 	"Sharykhin/rent-car/domain/requisition/interfaces"
 	"Sharykhin/rent-car/domain/requisition/models"
@@ -15,7 +15,7 @@ import (
 type (
 	RequisitionService struct {
 		requisitionRepo interfaces.RequisitionRepositoryInterface
-		carRepo         intefaces.CarRepositoryInterface
+		carRepo         service.CarRepositoryInterface
 	}
 )
 

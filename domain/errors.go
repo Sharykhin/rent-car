@@ -2,24 +2,18 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 )
 
 type (
-	Code  string
-	Error struct {
-		Code    Code
-		Err     error
-		Message string
+	Code           string
+	StackOperation string
+	Error          struct {
+		Err       error
+		CallStack []StackOperation
+		Code      Code
 	}
 )
-
-func (e Error) Error() string {
-	return fmt.Sprintf("code - %v, error - %s ", e.Code, e.Err.Error())
-}
-
-func (e Error) Unwrap() error {
-	return e.Err
-}
 
 const (
 	ValidationErrorCode       Code = "VALIDATION"
@@ -27,16 +21,39 @@ const (
 	ResourceNotFoundErrorCode      = "RESOURCE_NOT_FOUND"
 )
 
-// NewError creates a new domain error with corresponding code and semantical message
-func NewError(err error, code Code, message string) *Error {
+func (e *Error) Error() string {
+	ops := ""
+	for i := len(e.CallStack) - 1; i >= 0; i-- {
+		ops += string(e.CallStack[i]) + " "
+	}
+	ops = strings.TrimRight(ops, " ")
+
+	return fmt.Sprintf("%s %s", ops, e.Err.Error())
+}
+
+func (e Error) Unwrap() error {
+	return e.Err
+}
+
+func NewError(err error, operation StackOperation, code Code) *Error {
 	return &Error{
-		Code:    code,
-		Err:     err,
-		Message: message,
+		Err:       err,
+		CallStack: []StackOperation{operation},
+		Code:      code,
 	}
 }
 
 // NewInternalError creates domain internal server error
-func NewInternalError(err error) *Error {
-	return NewError(err, InternalServerErrorCode, "Something went wrong")
+func NewInternalError(err error, operation StackOperation) *Error {
+	return NewError(err, operation, InternalServerErrorCode)
+}
+
+func WrapErrorWithStack(origin error, operation StackOperation) *Error {
+	target, ok := origin.(*Error)
+	if !ok {
+		panic("origin error must be instance of Error2")
+	}
+	target.CallStack = append(target.CallStack, operation)
+
+	return target
 }

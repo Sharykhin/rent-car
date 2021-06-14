@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ErrConsumerEmailRequired = errors.New("[consumer][IsConsumerEmailCorrectSpecification] email is required")
+	ErrConsumerEmailRequired = errors.New("email is required")
 	ErrConsumerEmailInvalid  = errors.New("[consumer][IsConsumerEmailCorrectSpecification] email is invalid")
 
 	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
@@ -21,11 +21,19 @@ var (
 func IsConsumerEmailCorrectSpecification(consumer *models.ConsumerModel) error {
 	isEmpty := consumer.Email == ""
 	if isEmpty {
-		return domain.NewError(ErrConsumerEmailRequired, domain.ValidationErrorCode, "email is required")
+		return domain.NewError(
+			ErrConsumerEmailRequired,
+			"[domain][consumer][specification][IsConsumerEmailCorrectSpecification]",
+			domain.ValidationErrorCode,
+		)
 	}
 
 	if !isEmailValid(consumer.Email) {
-		return domain.NewError(ErrConsumerEmailInvalid, domain.ValidationErrorCode, "email is invalid")
+		return domain.NewError(
+			ErrConsumerEmailInvalid,
+			"[domain][consumer][specification][IsConsumerEmailCorrectSpecification]",
+			domain.ValidationErrorCode,
+		)
 	}
 
 	return nil

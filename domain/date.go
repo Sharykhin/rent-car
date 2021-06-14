@@ -29,8 +29,8 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 
 	return NewError(
 		fmt.Errorf("provided date %s is has invalid format", s),
+		"[domain][Date][UnmarshalJSON]",
 		ValidationErrorCode,
-		"Date format is invalid",
 	)
 }
 

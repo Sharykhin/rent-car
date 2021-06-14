@@ -6,6 +6,8 @@ import (
 
 	"database/sql"
 	_ "github.com/lib/pq"
+
+	"Sharykhin/rent-car/domain"
 )
 
 type (
@@ -19,8 +21,12 @@ type (
 // NewConnection creates a new Connection instance
 func NewConnection(dns string) (*Connection, error) {
 	if dns == "" {
-		return nil, errors.New("[postgres] dns string is empty")
+		return nil, domain.NewInternalError(
+			errors.New("dns string is empty"),
+			"[infrastructure][postgres][NewConnection]",
+		)
 	}
+
 	conn := Connection{
 		dns: dns,
 		DB:  nil,
@@ -33,7 +39,11 @@ func NewConnection(dns string) (*Connection, error) {
 func (conn *Connection) Connect() error {
 	db, err := sql.Open("postgres", conn.dns)
 	if err != nil {
-		return fmt.Errorf("[postgres][Connection] failed to connect to postgres: %v", err)
+		return domain.NewInternalError(
+			fmt.Errorf("failed to connect to postgres: %v", err),
+			"[infrastructure][postgres][Connection][Connect]",
+		)
+
 	}
 
 	conn.DB = db
@@ -45,7 +55,10 @@ func (conn *Connection) Connect() error {
 func (conn *Connection) Close() error {
 	err := conn.DB.Close()
 	if err != nil {
-		return fmt.Errorf("[postgres][Connection] failed to close postgres: %v", err)
+		return domain.NewInternalError(
+			fmt.Errorf("failed to close postgres connection: %v", err),
+			"[infrastructure][postgres][Connection][Close]",
+		)
 	}
 
 	return nil

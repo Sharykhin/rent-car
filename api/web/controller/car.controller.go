@@ -35,13 +35,13 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	err := util.DecodeJSONBody(w, r, &payload)
 
 	if err != nil {
-		response.Fail(w, err)
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][CreateCar]"))
 		return
 	}
 
 	c, err := ctrl.carService.CreateNewCar(r.Context(), payload.Model)
 	if err != nil {
-		response.Fail(w, err)
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][CreateCar]"))
 		return
 	}
 
@@ -54,7 +54,7 @@ func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	c, err := ctrl.carService.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
-		response.Fail(w, err)
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][GetCarByID]"))
 		return
 	}
 

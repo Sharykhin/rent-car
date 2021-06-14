@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"time"
 
 	"Sharykhin/rent-car/domain"
@@ -20,7 +19,7 @@ func NewCarModel(m value.Model) (*model.CarModel, error) {
 
 	err := specification.IsCarModelCorrectSpecification(&c)
 	if err != nil {
-		return nil, fmt.Errorf("[domain][car][factory][NewCarModel] failed to create a new car model: %w", err)
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][factory][NewCarModel]")
 	}
 
 	return &c, nil

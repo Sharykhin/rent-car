@@ -72,7 +72,7 @@ func Fail(w http.ResponseWriter, err error) {
 	var domainErr *domain.Error
 	var malformedErr *util.MalformedRequest
 	if errors.As(err, &domainErr) {
-		asDomainError(w, domainErr.Message, domainErr.Code, err)
+		asDomainError(w, domainErr.Err.Error(), domainErr.Code, err)
 		return
 	}
 	if errors.As(err, &malformedErr) {
