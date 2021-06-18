@@ -2,12 +2,14 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/lib/pq"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/consumer/models"
+	"Sharykhin/rent-car/domain/consumer/model"
 	"Sharykhin/rent-car/infrastructure/postgres"
 )
 
@@ -22,6 +24,12 @@ const (
 	constraintUniqueCode = "23505"
 )
 
+var (
+	ErrEmailAlreadyExists = errors.New("email is already in use")
+	// ErrConsumerNotFound describes error when car was not found
+	ErrConsumerNotFound = errors.New("consumer was not found")
+)
+
 // NewPostgresConsumerRepository creates a new consumer repository instance
 func NewPostgresConsumerRepository(conn *postgres.Connection) *PostgresConsumerRepository {
 	r := PostgresConsumerRepository{
@@ -34,8 +42,8 @@ func NewPostgresConsumerRepository(conn *postgres.Connection) *PostgresConsumerR
 // CreateConsumer creates a new consumer
 func (r *PostgresConsumerRepository) CreateConsumer(
 	ctx context.Context,
-	consumer *models.ConsumerModel,
-) (*models.ConsumerModel, error) {
+	consumer *model.ConsumerModel,
+) (*model.ConsumerModel, error) {
 	var id domain.ID
 	stmt := `insert into public.consumers(first_name, last_name, email, created_at) values($1, $2, $3, $4) returning id`
 
@@ -44,7 +52,7 @@ func (r *PostgresConsumerRepository) CreateConsumer(
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == constraintUniqueCode {
 			return nil, domain.NewError(
-				fmt.Errorf("failed to insert a new record into consumers table: %v", err),
+				ErrEmailAlreadyExists,
 				"[infrastructure][postgres][repositories][PostgresConsumerRepository][CreateConsumer]",
 				domain.ValidationErrorCode,
 			)
@@ -56,14 +64,42 @@ func (r *PostgresConsumerRepository) CreateConsumer(
 		)
 	}
 
-	newConsumer := models.ConsumerModel{
-		ID:           id,
-		FirstName:    consumer.FirstName,
-		LastName:     consumer.LastName,
-		Email:        consumer.Email,
-		CreatedAt:    consumer.CreatedAt,
-		Requisitions: consumer.Requisitions,
+	newConsumer := model.ConsumerModel{
+		ID:        id,
+		FirstName: consumer.FirstName,
+		LastName:  consumer.LastName,
+		Email:     consumer.Email,
+		CreatedAt: consumer.CreatedAt,
 	}
 
 	return &newConsumer, nil
+}
+
+func (r *PostgresConsumerRepository) GetConsumerByID(ctx context.Context, ID domain.ID) (*model.ConsumerModel, error) {
+	consumer := model.ConsumerModel{}
+	stmt := `select id, first_name, last_name, email, created_at from public.consumers where id = $1`
+	err := r.conn.DB.QueryRowContext(ctx, stmt, ID).Scan(
+		&consumer.ID,
+		&consumer.FirstName,
+		&consumer.LastName,
+		&consumer.Email,
+		&consumer.CreatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.NewError(
+				ErrConsumerNotFound,
+				"[infrastructure][postgres][repositories][PostgresConsumerRepository][GetConsumerByID]",
+				domain.ResourceNotFoundErrorCode,
+			)
+		}
+
+		return nil, domain.NewInternalError(
+			fmt.Errorf("failed to find a consumer in a database: %v", err),
+			"[infrastructure][postgres][repositories][PostgresConsumerRepository][GetConsumerByID]",
+		)
+	}
+
+	return &consumer, nil
 }

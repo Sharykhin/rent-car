@@ -7,18 +7,18 @@ import (
 	"strings"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/consumer/models"
+	"Sharykhin/rent-car/domain/consumer/model"
 )
 
 var (
 	ErrConsumerEmailRequired = errors.New("email is required")
-	ErrConsumerEmailInvalid  = errors.New("[consumer][IsConsumerEmailCorrectSpecification] email is invalid")
+	ErrConsumerEmailInvalid  = errors.New("email is invalid")
 
 	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 // IsConsumerEmailCorrectSpecification validates consumer email
-func IsConsumerEmailCorrectSpecification(consumer *models.ConsumerModel) error {
+func IsConsumerEmailCorrectSpecification(consumer *model.ConsumerModel) error {
 	isEmpty := consumer.Email == ""
 	if isEmpty {
 		return domain.NewError(

@@ -7,7 +7,7 @@ import (
 
 	"Sharykhin/rent-car/api/web/controller"
 	carService "Sharykhin/rent-car/domain/car/service"
-	consumerServices "Sharykhin/rent-car/domain/consumer/services"
+	consumerServices "Sharykhin/rent-car/domain/consumer/service"
 	requisitionService "Sharykhin/rent-car/domain/requisition/service"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	postgresRepos "Sharykhin/rent-car/infrastructure/postgres/repositories"
@@ -55,7 +55,11 @@ func Init() error {
 
 	carSrv := carService.NewCarService(postgresCarRepository)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository)
-	requisitionSrv := requisitionService.NewRequisitionService(postgresRequisitionRepository)
+	requisitionSrv := requisitionService.NewRequisitionService(
+		postgresRequisitionRepository,
+		postgresCarRepository,
+		postgresConsumerRepository,
+	)
 
 	carController := controller.NewCarController(carSrv)
 	consumerController := controller.NewConsumerController(consumerService)

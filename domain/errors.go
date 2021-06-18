@@ -17,6 +17,7 @@ type (
 
 const (
 	ValidationErrorCode       Code = "VALIDATION"
+	PayloadIsTooLarge              = "PAYLOAD_IS_TOO_LARGE"
 	InternalServerErrorCode        = "INTERNAL_SERVER"
 	ResourceNotFoundErrorCode      = "RESOURCE_NOT_FOUND"
 )

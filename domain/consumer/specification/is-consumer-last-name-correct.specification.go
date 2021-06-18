@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/consumer/models"
+	"Sharykhin/rent-car/domain/consumer/model"
 )
 
 const (
@@ -17,7 +17,7 @@ var (
 )
 
 // IsConsumerLastNameCorrectSpecification validates consumer last name
-func IsConsumerLastNameCorrectSpecification(consumer *models.ConsumerModel) error {
+func IsConsumerLastNameCorrectSpecification(consumer *model.ConsumerModel) error {
 	isEmpty := consumer.LastName == ""
 	if isEmpty {
 		return domain.NewError(

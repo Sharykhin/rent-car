@@ -40,7 +40,13 @@ func (ctrl *RequisitionController) CreateRequisition(w http.ResponseWriter, r *h
 	err := util.DecodeJSONBody(w, r, &payload)
 	fmt.Println(payload)
 	if err != nil {
-		response.Fail(w, err)
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][RequisitionController][CreateRequisition]"))
+		return
+	}
+
+	requisition, err := ctrl.requisitionSrv.RentCar(r.Context(), payload.CarID, payload.ConsumerID, payload.StartAt, payload.EndAt)
+	if err != nil {
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][RequisitionController][CreateRequisition]"))
 		return
 	}
 
@@ -50,5 +56,5 @@ func (ctrl *RequisitionController) CreateRequisition(w http.ResponseWriter, r *h
 	//	return
 	//}
 
-	response.Created(w, nil, nil)
+	response.Created(w, requisition, nil)
 }

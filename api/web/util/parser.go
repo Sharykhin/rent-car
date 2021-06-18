@@ -7,25 +7,17 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"Sharykhin/rent-car/domain"
 )
 
-type (
-	// MalformedRequest handles incoming request body to ensures that it is a valid json
-	MalformedRequest struct {
-		Status int
-		Msg    string
-	}
+const (
+	MaxPayloadInBytes = 1048576
 )
 
-// Error implements error interface
-func (mr *MalformedRequest) Error() string {
-	return mr.Msg
-}
-
-// TODO: @think probably we can use the same domain error and not to create a new struct(MalformedRequest)?
 // DecodeJSONBody parses request body into destination struct
 func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) error {
-	r.Body = http.MaxBytesReader(w, r.Body, 1048576)
+	r.Body = http.MaxBytesReader(w, r.Body, MaxPayloadInBytes)
 
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
@@ -37,39 +29,58 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 
 		switch {
 		case errors.As(err, &syntaxError):
-			msg := fmt.Sprintf("request body contains badly-formed JSON (at position %d)", syntaxError.Offset)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return domain.NewError(
+				fmt.Errorf("request body contains badly-formed JSON (at position %d)", syntaxError.Offset),
+				"[api][web][util][DecodeJSONBody]",
+				domain.ValidationErrorCode,
+			)
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
-			msg := fmt.Sprintf("request body contains badly-formed JSON")
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return domain.NewError(
+				errors.New("request body contains badly-formed JSON"),
+				"[api][web][util][DecodeJSONBody]",
+				domain.ValidationErrorCode,
+			)
 
 		case errors.As(err, &unmarshalTypeError):
-			msg := fmt.Sprintf("request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return domain.NewError(
+				fmt.Errorf("request body contains an invalid value for the %q field (at position %d)", unmarshalTypeError.Field, unmarshalTypeError.Offset),
+				"[api][web][util][DecodeJSONBody]",
+				domain.ValidationErrorCode,
+			)
 
 		case strings.HasPrefix(err.Error(), "json: unknown field "):
 			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
-			msg := fmt.Sprintf("request body contains unknown field %s", fieldName)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return domain.NewError(
+				fmt.Errorf("request body contains unknown field %s", fieldName),
+				"[api][web][util][DecodeJSONBody]",
+				domain.ValidationErrorCode,
+			)
 
 		case errors.Is(err, io.EOF):
-			msg := "request body must not be empty"
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
-
+			return domain.NewError(
+				errors.New("request body must not be empty"),
+				"[api][web][util][DecodeJSONBody]",
+				domain.ValidationErrorCode,
+			)
 		case err.Error() == "http: request body too large":
-			msg := "request body must not be larger than 1MB"
-			return &MalformedRequest{Status: http.StatusRequestEntityTooLarge, Msg: msg}
-
+			return domain.NewError(
+				errors.New("request body must not be larger than 1MB"),
+				"[api][web][util][DecodeJSONBody]",
+				domain.PayloadIsTooLarge,
+			)
 		default:
-			return err
+			return domain.NewInternalError(err, "[api][web][util][DecodeJSONBody]")
 		}
 	}
 
 	err = dec.Decode(&struct{}{})
 	if err != io.EOF {
-		msg := "Request body must only contain a single JSON object"
-		return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+		return domain.NewError(
+			errors.New("request body must only contain a single JSON object"),
+			"[api][web][util][DecodeJSONBody]",
+			domain.ValidationErrorCode,
+		)
 	}
 
 	return nil

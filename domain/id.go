@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
 	guuid "github.com/google/uuid"
@@ -12,14 +12,14 @@ type (
 	ID string
 )
 
+var (
+	ErrIDInvalid = errors.New("id is not valid")
+)
+
 func (id *ID) UnmarshalJSON(b []byte) error {
 	s, err := ParseID(string(b))
 	if err != nil {
-		return NewError(
-			fmt.Errorf("id is incorrect: %v", err),
-			"[domain][ID][UnmarshalJSON]",
-			ValidationErrorCode,
-		)
+		return WrapErrorWithStack(err, "[domain][ID][UnmarshalJSON]")
 	}
 
 	*id = s
@@ -40,7 +40,7 @@ func (id ID) IsEmpty() bool {
 func ParseID(id string) (ID, error) {
 	guid, err := guuid.Parse(id)
 	if err != nil {
-		return "", fmt.Errorf("id is not valid")
+		return "", NewError(ErrIDInvalid, "[domain][ParseID]", ValidationErrorCode)
 	}
 
 	return ID(guid.String()), nil

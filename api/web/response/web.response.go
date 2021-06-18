@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/logger"
 )
@@ -70,42 +69,24 @@ func Created(w http.ResponseWriter, data interface{}, meta interface{}) {
 func Fail(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	var domainErr *domain.Error
-	var malformedErr *util.MalformedRequest
 	if errors.As(err, &domainErr) {
 		asDomainError(w, domainErr.Err.Error(), domainErr.Code, err)
 		return
 	}
-	if errors.As(err, &malformedErr) {
-		asNativeError(w, malformedErr.Status, malformedErr.Msg, domain.ValidationErrorCode, err)
-		return
-	}
+
 	asDomainError(w, err.Error(), domain.InternalServerErrorCode, err)
-}
-
-// asNativeError translates non-domain errors into web
-func asNativeError(w http.ResponseWriter, status int, msg string, code domain.Code, origin error) {
-	switch status {
-	case http.StatusInternalServerError:
-		logger.Log.Error(origin)
-	}
-
-	w.WriteHeader(status)
-	r := errorResponse{
-		Error: webError{
-			Code:    code,
-			Message: msg,
-		},
-	}
-	sendErrorResponse(w, &r)
 }
 
 // asDomainError translates domain error into web
 func asDomainError(w http.ResponseWriter, message string, code domain.Code, origin error) {
+	logger.Log.Info(origin)
+
 	switch code {
 	case domain.ResourceNotFoundErrorCode:
 		w.WriteHeader(http.StatusNotFound)
+	case domain.PayloadIsTooLarge:
+		w.WriteHeader(http.StatusRequestEntityTooLarge)
 	case domain.ValidationErrorCode:
-		logger.Log.Info(origin)
 		w.WriteHeader(http.StatusBadRequest)
 	default:
 		logger.Log.Error(origin)
@@ -118,6 +99,7 @@ func asDomainError(w http.ResponseWriter, message string, code domain.Code, orig
 			Message: message,
 		},
 	}
+
 	sendErrorResponse(w, &r)
 }
 

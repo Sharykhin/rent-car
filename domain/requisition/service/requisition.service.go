@@ -1,27 +1,33 @@
 package service
 
 import (
+	"Sharykhin/rent-car/domain/requisition/value"
 	"context"
 	"time"
 
 	"Sharykhin/rent-car/domain"
-	carModels "Sharykhin/rent-car/domain/car/model"
-	"Sharykhin/rent-car/domain/car/service"
-	consumerModels "Sharykhin/rent-car/domain/consumer/models"
-	"Sharykhin/rent-car/domain/requisition/interfaces"
-	"Sharykhin/rent-car/domain/requisition/models"
+	carServices "Sharykhin/rent-car/domain/car/service"
+	consumerServices "Sharykhin/rent-car/domain/consumer/service"
+	"Sharykhin/rent-car/domain/requisition/model"
 )
 
 type (
 	RequisitionService struct {
-		requisitionRepo interfaces.RequisitionRepositoryInterface
-		carRepo         service.CarRepositoryInterface
+		requisitionRepo RequisitionRepositoryInterface
+		carRepo         carServices.CarRepositoryInterface
+		consumerRepo    consumerServices.ConsumerRepositoryInterface
 	}
 )
 
-func NewRequisitionService(requisitionRep interfaces.RequisitionRepositoryInterface) *RequisitionService {
+func NewRequisitionService(
+	requisitionRepo RequisitionRepositoryInterface,
+	carRepo carServices.CarRepositoryInterface,
+	consumerRepo consumerServices.ConsumerRepositoryInterface,
+) *RequisitionService {
 	srv := RequisitionService{
-		requisitionRepo: requisitionRep,
+		requisitionRepo: requisitionRepo,
+		carRepo:         carRepo,
+		consumerRepo:    consumerRepo,
 	}
 
 	return &srv
@@ -31,30 +37,34 @@ func (srv *RequisitionService) RentCar(
 	ctx context.Context,
 	carID domain.ID,
 	consumerID domain.ID,
-	startAt time.Time,
-	endAt time.Time,
-) (*models.Requisition, error) {
-	return nil, nil
-}
+	startAt domain.Date,
+	endAt domain.Date,
+) (*model.RequisitionModel, error) {
+	car, err := srv.carRepo.GetCarByID(ctx, carID)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
+	}
 
-func (srv *RequisitionService) RentCar2(ctx context.Context) (*models.Requisition, error) {
-	requisition := models.Requisition{
-		ID: domain.Empty(),
-		Consumer: &consumerModels.ConsumerModel{
-			ID:           domain.ID("8403116a-be3c-477d-a198-09f9adcda313"),
-			FirstName:    "",
-			LastName:     "",
-			CreatedAt:    time.Now(),
-			Requisitions: nil,
-		},
-		Car: &carModels.CarModel{
-			ID: domain.ID("a87be964-770d-4af5-9269-b9874f1fadc0"),
-		},
-		DateFrom:  time.Now(),
-		DateTo:    time.Now(),
+	consumer, err := srv.consumerRepo.GetConsumerByID(ctx, consumerID)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
+	}
+	period, err := value.NewPeriod(startAt, endAt)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
+	}
+	requisition := model.RequisitionModel{
+		ID:        domain.Empty(),
+		Car:       car,
+		Consumer:  consumer,
+		Period:    period,
 		CreatedAt: time.Now(),
 	}
-	r, err := srv.requisitionRepo.CreateRequisition(ctx, requisition)
 
-	return r, err
+	r, err := srv.requisitionRepo.CreateRequisition(ctx, &requisition)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
+	}
+
+	return r, nil
 }
