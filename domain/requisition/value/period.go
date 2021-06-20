@@ -7,8 +7,8 @@ import (
 
 type (
 	Period struct {
-		StartAt domain.Date
-		EndAt   domain.Date
+		StartAt domain.Date `json:"start_at"`
+		EndAt   domain.Date `json:"end_at"`
 	}
 )
 

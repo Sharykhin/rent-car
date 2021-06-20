@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"Sharykhin/rent-car/api/web/response"
@@ -35,10 +34,10 @@ func NewRequisitionController(requisitionSrv *service.RequisitionService) *Requi
 	return &ctrl
 }
 
+// CreateRequisition handles endpoint of creating a new requisition
 func (ctrl *RequisitionController) CreateRequisition(w http.ResponseWriter, r *http.Request) {
 	var payload CreateRequisitionPayload
 	err := util.DecodeJSONBody(w, r, &payload)
-	fmt.Println(payload)
 	if err != nil {
 		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][RequisitionController][CreateRequisition]"))
 		return
@@ -49,12 +48,6 @@ func (ctrl *RequisitionController) CreateRequisition(w http.ResponseWriter, r *h
 		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][RequisitionController][CreateRequisition]"))
 		return
 	}
-
-	//req, err := ctrl.requisitionSrv.RentCar2(r.Context())
-	//if err != nil {
-	//	response.Fail(w, err)
-	//	return
-	//}
 
 	response.Created(w, requisition, nil)
 }

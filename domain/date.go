@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	//"database/sql/driver"
 )
 
 type (
@@ -38,3 +39,15 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 func (d Date) String() string {
 	return time.Time(d).Format("2006-01-02 15:04:05")
 }
+
+//
+//func (d Date) Value() (driver.Value, error) {
+//	return time.Time(d).Format("2006-01-02 15:04:05"), nil
+//}
+//
+//func (d Date) Parse(value string) (Date, error) {
+//	var err error
+//	date, err := time.Parse(time.RFC3339, value)
+//
+//	return Date(date), err
+//}

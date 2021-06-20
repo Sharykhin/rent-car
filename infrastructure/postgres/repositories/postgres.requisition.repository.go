@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"strings"
 
 	"github.com/lib/pq"
@@ -38,14 +39,16 @@ func (r *PostgresRequisitionRepository) CreateRequisition(
 	ctx context.Context,
 	requisition *model.RequisitionModel,
 ) (*model.RequisitionModel, error) {
-	_, err := r.conn.DB.ExecContext(
+	var newID domain.ID
+	err := r.conn.DB.QueryRowContext(
 		ctx,
-		"call rent_car($1, $2, $3, $4)",
+		"call rent_car($1, $2, $3, $4, $5)",
+		nil,
 		requisition.Car.ID,
 		requisition.Consumer.ID,
-		requisition.Period.StartAt,
-		requisition.Period.EndAt,
-	)
+		requisition.Period.StartAt.String(),
+		requisition.Period.EndAt.String(),
+	).Scan(&newID)
 
 	if err != nil {
 		pqErr := err.(*pq.Error)
@@ -63,5 +66,13 @@ func (r *PostgresRequisitionRepository) CreateRequisition(
 		)
 	}
 
-	return requisition, err
+	newRequisition := model.RequisitionModel{
+		ID:        newID,
+		Car:       requisition.Car,
+		Consumer:  requisition.Consumer,
+		Period:    requisition.Period,
+		CreatedAt: requisition.CreatedAt,
+	}
+
+	return &newRequisition, err
 }

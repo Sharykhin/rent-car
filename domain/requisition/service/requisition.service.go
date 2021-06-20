@@ -49,10 +49,13 @@ func (srv *RequisitionService) RentCar(
 	if err != nil {
 		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
 	}
+
 	period, err := value.NewPeriod(startAt, endAt)
 	if err != nil {
 		return nil, domain.WrapErrorWithStack(err, "[domain][requisition][service][RequisitionService][RentCar]")
 	}
+
+	// TODO: use factory
 	requisition := model.RequisitionModel{
 		ID:        domain.Empty(),
 		Car:       car,
