@@ -23,6 +23,13 @@ type (
 		StartAt    domain.Date `json:"start_at"`
 		EndAt      domain.Date `json:"end_at"`
 	}
+	RequisitionResponse struct {
+		ID         domain.ID   `json:"id"`
+		CarID      domain.ID   `json:"car_id"`
+		ConsumerID domain.ID   `json:"consumer_id"`
+		StartAt    domain.Date `json:"start_at"`
+		EndAt      domain.Date `json:"end_at"`
+	}
 )
 
 // NewRequisitionController is a function constructor that creates a new instance of requisition controller
@@ -49,5 +56,13 @@ func (ctrl *RequisitionController) CreateRequisition(w http.ResponseWriter, r *h
 		return
 	}
 
-	response.Created(w, requisition, nil)
+	res := RequisitionResponse{
+		ID:         requisition.ID,
+		CarID:      requisition.Car.ID,
+		ConsumerID: requisition.Consumer.ID,
+		StartAt:    requisition.Period.StartAt,
+		EndAt:      requisition.Period.EndAt,
+	}
+
+	response.Created(w, &res, nil)
 }

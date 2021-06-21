@@ -8,9 +8,9 @@ import (
 
 // ConsumerModel is a person who rents a car
 type ConsumerModel struct {
-	ID        domain.ID
-	FirstName string
-	LastName  string
-	Email     string
-	CreatedAt time.Time
+	ID        domain.ID `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
 }

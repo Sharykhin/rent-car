@@ -35,9 +35,19 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 	)
 }
 
+// MarshalJSON implements marshal
+func (d Date) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + d.String() + `"`), nil
+}
+
 // String implements stringer interface to represent custom Date type into string
 func (d Date) String() string {
-	return time.Time(d).Format("2006-01-02 15:04:05")
+	return time.Time(d).Format(time.RFC3339)
+}
+
+// After checks if the current date is after the provided one
+func (d Date) After(u Date) bool {
+	return time.Time(d).After(time.Time(u))
 }
 
 //
