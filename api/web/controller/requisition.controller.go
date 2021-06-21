@@ -23,6 +23,7 @@ type (
 		StartAt    domain.Date `json:"start_at"`
 		EndAt      domain.Date `json:"end_at"`
 	}
+	// RequisitionResponse represents requisition
 	RequisitionResponse struct {
 		ID         domain.ID   `json:"id"`
 		CarID      domain.ID   `json:"car_id"`
