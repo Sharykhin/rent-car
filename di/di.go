@@ -11,6 +11,7 @@ import (
 	requisitionService "Sharykhin/rent-car/domain/requisition/service"
 	"Sharykhin/rent-car/infrastructure/postgres"
 	postgresRepos "Sharykhin/rent-car/infrastructure/postgres/repositories"
+	"Sharykhin/rent-car/infrastructure/s3"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,6 +35,8 @@ type (
 		ConsumerController            *controller.ConsumerController
 		RequisitionController         *controller.RequisitionController
 		Logger                        *log.Entry
+		PostgresTransactionService    *postgres.TransactionService
+		S3Client                      *s3.Client
 	}
 )
 
@@ -48,12 +51,15 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("[di] failed to create a new postgers connection instance: %v", err)
 	}
-
+	postgresTransactionService := postgres.NewTransactionService(postgresConn)
 	postgresCarRepository := postgresRepos.NewPostgresCarRepository(postgresConn)
 	postgresConsumerRepository := postgresRepos.NewPostgresConsumerRepository(postgresConn)
 	postgresRequisitionRepository := postgresRepos.NewPostgresRequisitionRepository(postgresConn)
 
-	carSrv := carService.NewCarService(postgresCarRepository)
+	isS3ForcePathStyle := os.Getenv("AWS_S3_FORCE_PATH_STYLE") == "true"
+	s3Client := s3.NewClient(os.Getenv("AWS_S3_ENDPOINT"), isS3ForcePathStyle, os.Getenv("AWS_S3_BUCKET_NAME"))
+
+	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository)
 	requisitionSrv := requisitionService.NewRequisitionService(
 		postgresRequisitionRepository,
@@ -85,6 +91,8 @@ func Init() error {
 		ConsumerController:            consumerController,
 		RequisitionController:         requisitionController,
 		Logger:                        logger,
+		PostgresTransactionService:    postgresTransactionService,
+		S3Client:                      s3Client,
 	}
 
 	initialized = true

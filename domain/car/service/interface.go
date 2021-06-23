@@ -13,4 +13,7 @@ type (
 		CreateCar(ctx context.Context, c *model.CarModel) (*model.CarModel, error)
 		GetCarByID(ctx context.Context, ID domain.ID) (*model.CarModel, error)
 	}
+	FileStorageInterface interface {
+		Upload(ctx context.Context, path string, data []byte) error
+	}
 )

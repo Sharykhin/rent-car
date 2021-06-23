@@ -13,5 +13,19 @@ services:
       - 5432
     volumes:
       - postgres-data:/var/lib/postgresql/data/
+
+  minio:
+    image: minio/minio
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - minio_data:/data
+    entrypoint: sh
+    command: -c '/usr/bin/minio server /data'
+
 volumes:
   postgres-data:
+  minio_data:

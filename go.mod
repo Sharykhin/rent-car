@@ -3,6 +3,7 @@ module Sharykhin/rent-car
 go 1.13
 
 require (
+	github.com/aws/aws-sdk-go v1.38.65 // indirect
 	github.com/brianvoe/gofakeit/v6 v6.4.1 // indirect
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	github.com/google/uuid v1.2.0

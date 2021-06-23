@@ -1,11 +1,6 @@
 package main
 
 import (
-	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/factory"
-	"Sharykhin/rent-car/domain/car/specification"
-	"Sharykhin/rent-car/infrastructure/postgres/query"
-	"Sharykhin/rent-car/infrastructure/postgres/repositories"
 	"context"
 	"errors"
 	"fmt"
@@ -31,16 +26,34 @@ func main() {
 	err = postgres.Connect()
 	defer postgres.Close()
 
-	carQueryRepository := query.NewPostgresCarQuery(postgres)
-	cars, total, err := carQueryRepository.GetPagedCarsList(context.TODO(), 2, 0)
+	ctx := context.Background()
+	decor(ctx, func(txCtx context.Context) error {
+		a(txCtx, 10)
 
-	fmt.Println(cars, total, err)
+		return errors.New("ha ha ha")
+	})
 
-	car, err := factory.NewCarModel("")
+}
 
-	fmt.Println(err, car, errors.Is(err, specification.ErrCarModelRequired))
+func a(ctx context.Context, in int) bool {
+	f := ctx.Value("foo")
+	fmt.Println("foo", f, in)
 
-	car, err = di.Container.PostgresCarRepository.GetCarByID(context.Background(), domain.ID("d92b94c8-6d3f-4663-b5da-f61c653eb898"))
-	fmt.Println(car, err, errors.Is(err, repositories.ErrCarNotFound))
+	return true
+}
+
+func b(s string) string {
+	return s + "10"
+}
+
+func decor(ctx context.Context, fn func(context.Context) error) {
+	fmt.Println("decor")
+	newCtx := context.WithValue(ctx, "foo", "bar")
+	err := fn(newCtx)
+	if err != nil {
+		fmt.Println("rollback")
+	} else {
+		fmt.Println("commit?")
+	}
 
 }

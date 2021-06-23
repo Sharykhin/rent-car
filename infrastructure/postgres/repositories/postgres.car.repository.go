@@ -35,8 +35,18 @@ func NewPostgresCarRepository(conn *postgres.Connection) *PostgresCarRepository 
 // CreateCar creates a new car
 func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarModel) (*model.CarModel, error) {
 	var id domain.ID
+	var err error
+
 	stmt := `insert into public.cars(model, created_at) values($1, $2) returning id`
-	err := r.conn.DB.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
+
+	txVal := ctx.Value(postgres.TXKey)
+	tx, ok := txVal.(*sql.Tx)
+	if ok {
+		err = tx.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
+	} else {
+		err = r.conn.DB.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
+	}
+
 	if err != nil {
 		return nil, domain.NewInternalError(
 			fmt.Errorf("failed to insert a new car record into cars table: %v", err),

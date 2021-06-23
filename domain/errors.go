@@ -52,7 +52,7 @@ func NewInternalError(err error, operation StackOperation) *Error {
 func WrapErrorWithStack(origin error, operation StackOperation) *Error {
 	target, ok := origin.(*Error)
 	if !ok {
-		panic("origin error must be instance of Error2")
+		panic("origin error must be instance of Error")
 	}
 	target.CallStack = append(target.CallStack, operation)
 
