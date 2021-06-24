@@ -45,9 +45,18 @@ func (r *PostgresConsumerRepository) CreateConsumer(
 	consumer *model.ConsumerModel,
 ) (*model.ConsumerModel, error) {
 	var id domain.ID
+	var err error
+
 	stmt := `insert into public.consumers(first_name, last_name, email, created_at) values($1, $2, $3, $4) returning id`
 
-	err := r.conn.DB.QueryRowContext(ctx, stmt, consumer.FirstName, consumer.LastName, consumer.Email, consumer.CreatedAt).Scan(&id)
+	txVal := ctx.Value(postgres.TXKey)
+	tx, ok := txVal.(*sql.Tx)
+	if ok {
+		err = tx.QueryRowContext(ctx, stmt, consumer.FirstName, consumer.LastName, consumer.Email, consumer.CreatedAt).Scan(&id)
+	} else {
+		err = r.conn.DB.QueryRowContext(ctx, stmt, consumer.FirstName, consumer.LastName, consumer.Email, consumer.CreatedAt).Scan(&id)
+	}
+
 	if err != nil {
 		pqErr := err.(*pq.Error)
 		if pqErr.Code == constraintUniqueCode {

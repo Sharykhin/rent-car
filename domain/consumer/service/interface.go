@@ -13,4 +13,8 @@ type (
 		CreateConsumer(ctx context.Context, consumer *model.ConsumerModel) (*model.ConsumerModel, error)
 		GetConsumerByID(ctx context.Context, ID domain.ID) (*model.ConsumerModel, error)
 	}
+	// FileStorageInterface describes api of storing files
+	FileStorageInterface interface {
+		Upload(ctx context.Context, path string, data []byte) error
+	}
 )

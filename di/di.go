@@ -60,7 +60,7 @@ func Init() error {
 	s3Client := s3.NewClient(os.Getenv("AWS_S3_ENDPOINT"), isS3ForcePathStyle, os.Getenv("AWS_S3_BUCKET_NAME"))
 
 	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client)
-	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository)
+	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository, postgresTransactionService, s3Client)
 	requisitionSrv := requisitionService.NewRequisitionService(
 		postgresRequisitionRepository,
 		postgresCarRepository,

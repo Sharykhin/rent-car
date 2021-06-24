@@ -1,10 +1,8 @@
 package s3
 
 import (
-	"Sharykhin/rent-car/logger"
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -14,15 +12,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/logger"
 )
 
 type (
+	// Client provides api to upload file on S3 to already specified bucket
 	Client struct {
 		s3     *s3.S3
 		bucket string
 	}
 )
 
+// NewClient creates a new instance of client. Such params as endpoint and forcePath are used mostly
+// for local development to store files in minio
 func NewClient(endpoint string, forcePath bool, bucket string) *Client {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -47,6 +49,7 @@ func NewClient(endpoint string, forcePath bool, bucket string) *Client {
 	}
 }
 
+// Upload uploads file on S3 with public-read
 func (c *Client) Upload(ctx context.Context, path string, data []byte) error {
 	logger.Log.Debugf("[infrastructure][s3][Client][Upload] uploading file to %s/%s", c.bucket, path)
 	_, err := c.s3.PutObject(&s3.PutObjectInput{

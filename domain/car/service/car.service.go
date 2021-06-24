@@ -66,7 +66,7 @@ func (srv *CarService) createCar(ctx context.Context, car *model.CarModel) (*mod
 			)
 		}
 
-		err = srv.fileStorage.Upload(ctx, "car.json", b)
+		err = srv.fileStorage.Upload(ctx, "cars/"+car.ID.String()+"/car.json", b)
 		if err != nil {
 			return domain.WrapErrorWithStack(err, "[domain][car][service][CarService][createCar]")
 		}
