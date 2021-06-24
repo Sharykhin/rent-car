@@ -10,8 +10,11 @@ current_dir = $(shell pwd)
 web:
 	LOG_LEVEL=debug go run cmd/web/main.go
 
-test:
+t:
 	LOG_LEVEL=debug go run cmd/cli/main.go
+
+test:
+	go test -v ./... | { grep -v 'no test files'; true; }
 
 migrate-create:
 	docker run -v ${current_dir}/db/migrations:/db/migrations migrate/migrate create -ext sql -dir db/migrations -seq $(name)
