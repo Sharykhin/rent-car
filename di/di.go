@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"Sharykhin/rent-car/api/web/controller"
+	"Sharykhin/rent-car/domain/car/factory"
 	carService "Sharykhin/rent-car/domain/car/service"
 	consumerServices "Sharykhin/rent-car/domain/consumer/service"
 	requisitionService "Sharykhin/rent-car/domain/requisition/service"
@@ -28,6 +29,9 @@ type (
 		PostgresCarRepository         *postgresRepos.PostgresCarRepository
 		PostgresConsumerRepository    *postgresRepos.PostgresConsumerRepository
 		PostgresRequisitionRepository *postgresRepos.PostgresRequisitionRepository
+		PostgresTransactionService    *postgres.TransactionService
+		S3Client                      *s3.Client
+		EngineValueFactory            *factory.EngineValueFactory
 		CarService                    *carService.CarService
 		ConsumerService               *consumerServices.ConsumerService
 		RequisitionService            *requisitionService.RequisitionService
@@ -35,8 +39,6 @@ type (
 		ConsumerController            *controller.ConsumerController
 		RequisitionController         *controller.RequisitionController
 		Logger                        *log.Entry
-		PostgresTransactionService    *postgres.TransactionService
-		S3Client                      *s3.Client
 	}
 )
 
@@ -47,6 +49,7 @@ func Init() error {
 		return AlreadyInitializedError
 	}
 
+	// Infrastructure
 	postgresConn, err := postgres.NewConnection(os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		return fmt.Errorf("[di] failed to create a new postgers connection instance: %v", err)
@@ -57,9 +60,11 @@ func Init() error {
 	postgresRequisitionRepository := postgresRepos.NewPostgresRequisitionRepository(postgresConn)
 
 	isS3ForcePathStyle := os.Getenv("AWS_S3_FORCE_PATH_STYLE") == "true"
-	s3Client := s3.NewClient(os.Getenv("AWS_S3_ENDPOINT"), isS3ForcePathStyle, os.Getenv("AWS_S3_BUCKET_NAME"))
+	s3Client := s3.NewClient(os.Getenv("AWS_S3_ENDPOINT"), isS3ForcePathStyle, os.Getenv("AWS_S3_BUCKET_NAME"), os.Getenv("AWS_S3_REGION"))
 
-	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client)
+	// Domain
+	engineValueFactory := factory.NewEngineValueFactory(true)
+	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client, engineValueFactory)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository, postgresTransactionService, s3Client)
 	requisitionSrv := requisitionService.NewRequisitionService(
 		postgresRequisitionRepository,
@@ -84,6 +89,9 @@ func Init() error {
 		PostgresCarRepository:         postgresCarRepository,
 		PostgresConsumerRepository:    postgresConsumerRepository,
 		PostgresRequisitionRepository: postgresRequisitionRepository,
+		PostgresTransactionService:    postgresTransactionService,
+		S3Client:                      s3Client,
+		EngineValueFactory:            engineValueFactory,
 		CarService:                    carSrv,
 		ConsumerService:               consumerService,
 		RequisitionService:            requisitionSrv,
@@ -91,8 +99,6 @@ func Init() error {
 		ConsumerController:            consumerController,
 		RequisitionController:         requisitionController,
 		Logger:                        logger,
-		PostgresTransactionService:    postgresTransactionService,
-		S3Client:                      s3Client,
 	}
 
 	initialized = true

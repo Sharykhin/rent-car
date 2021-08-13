@@ -6,6 +6,7 @@ ifneq (,$(wildcard ./.env))
 endif
 
 current_dir = $(shell pwd)
+network ?= host
 
 web:
 	LOG_LEVEL=debug go run cmd/web/main.go
@@ -20,7 +21,7 @@ migrate-create:
 	docker run -v ${current_dir}/db/migrations:/db/migrations migrate/migrate create -ext sql -dir db/migrations -seq $(name)
 
 migrate-up:
-	docker run --network host -v ${current_dir}/db/migrations:/db/migrations migrate/migrate -database ${POSTGRES_URL} -path db/migrations up
+	docker run --network $(network) -v ${current_dir}/db/migrations:/db/migrations migrate/migrate -database ${POSTGRES_URL} -path db/migrations up
 
 migrate-down:
-	docker run --network host -v ${current_dir}/db/migrations:/db/migrations migrate/migrate -database ${POSTGRES_URL} -path db/migrations down 1
+	docker run --network $(network) -v ${current_dir}/db/migrations:/db/migrations migrate/migrate -database ${POSTGRES_URL} -path db/migrations down 1

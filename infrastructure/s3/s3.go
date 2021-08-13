@@ -25,7 +25,7 @@ type (
 
 // NewClient creates a new instance of client. Such params as endpoint and forcePath are used mostly
 // for local development to store files in minio
-func NewClient(endpoint string, forcePath bool, bucket string) *Client {
+func NewClient(endpoint string, forcePath bool, bucket string, region string) *Client {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -41,6 +41,7 @@ func NewClient(endpoint string, forcePath bool, bucket string) *Client {
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
+		Region: aws.String(region),
 	})
 
 	return &Client{

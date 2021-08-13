@@ -1,10 +1,10 @@
 package query
 
 import (
-	"Sharykhin/rent-car/domain"
 	"context"
 	"fmt"
 
+	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/infrastructure/postgres"
 )
 
@@ -28,23 +28,23 @@ func NewPostgresCarQuery(conn *postgres.Connection) *PostgresCarQuery {
 func (r *PostgresCarQuery) GetPagedCarsList(ctx context.Context, limit, offset int) ([]CarQueryEntity, int, error) {
 	rows, err := r.conn.DB.QueryContext(ctx, `select id from cars limit $1 offset $2`, limit, offset)
 
-	errChan := make(chan error)
-	defer close(errChan)
+	totalErrChan := make(chan error)
+	defer close(totalErrChan)
 	totalChan := make(chan int)
 	defer close(totalChan)
 
-	go func(ctx context.Context, totalChan chan<- int, errChan chan<- error) {
+	go func(ctx context.Context, totalChan chan<- int, totalErrChan chan<- error) {
 		var total int
 		err := r.conn.DB.QueryRowContext(ctx, "select count(*) from cars").Scan(&total)
 		if err != nil {
-			errChan <- domain.NewInternalError(
+			totalErrChan <- domain.NewInternalError(
 				fmt.Errorf("failed to make a count query: %v", err),
 				"[infrastructure][postgres][query][PostgresCarQuery][GetPagedCarsList]",
 			)
 			return
 		}
 		totalChan <- total
-	}(ctx, totalChan, errChan)
+	}(ctx, totalChan, totalErrChan)
 
 	if err != nil {
 		return nil, 0, domain.NewInternalError(
@@ -72,7 +72,7 @@ func (r *PostgresCarQuery) GetPagedCarsList(ctx context.Context, limit, offset i
 	var total int
 	select {
 	case total = <-totalChan:
-	case err := <-errChan:
+	case err := <-totalErrChan:
 		return nil, 0, err
 	}
 

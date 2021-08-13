@@ -52,6 +52,12 @@ func (s *Server) ListenAndServe() {
 	// TODO: @improve check deferred error
 	defer postgresConn.Close()
 
+	err = postgresConn.DB.Ping()
+	if err != nil {
+		s.log.Errorf("[Server][ListenAndServe] failed to connect to postgres: %v", err)
+		return
+	}
+
 	go func() {
 		s.log.Infof("[Server][ListenAndServe] started http server on port %s", s.port)
 		err := s.http.ListenAndServe()

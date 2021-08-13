@@ -11,9 +11,10 @@ import (
 type (
 	// CarModel represents a car that consumers will rent
 	CarModel struct {
-		ID        domain.ID   `json:"id"`
-		Model     value.Model `json:"model"`
-		CreatedAt time.Time   `json:"created_at"`
+		ID        domain.ID          `json:"id"`
+		Model     value.Model        `json:"model"`
+		Engine    *value.EngineValue `json:"engine"`
+		CreatedAt time.Time          `json:"created_at"`
 	}
 )
 

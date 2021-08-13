@@ -11,7 +11,7 @@ import (
 var (
 	// ErrCarModelRequired describes error that model is required
 	ErrCarModelRequired = errors.New("car model is required")
-	// ErrCarModelInvalid
+	// ErrCarModelInvalid means that car model is not from a valid list
 	ErrCarModelInvalid = errors.New("car model is invalid")
 )
 

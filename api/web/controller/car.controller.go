@@ -6,6 +6,7 @@ import (
 	"Sharykhin/rent-car/api/web/response"
 	"Sharykhin/rent-car/api/web/util"
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car/dto"
 	"Sharykhin/rent-car/domain/car/service"
 	"Sharykhin/rent-car/domain/car/value"
 )
@@ -18,7 +19,11 @@ type (
 
 	// CreateCarPayload this is a request body for creating a new car
 	CreateCarPayload struct {
-		Model value.Model `json:"model"`
+		Model  value.Model `json:"model"`
+		Engine struct {
+			Power   uint64 `json:"power"`
+			IsTurbo bool   `json:"is_turbo"`
+		} `json:"engine"`
 	}
 )
 
@@ -30,22 +35,28 @@ func NewCarController(carSrv *service.CarService) *CarController {
 	return &ctrl
 }
 
+// CreateCar handles http request to create a new car
 func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	var payload CreateCarPayload
 	err := util.DecodeJSONBody(w, r, &payload)
-
 	if err != nil {
 		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][CreateCar]"))
 		return
 	}
 
-	c, err := ctrl.carService.CreateNewCar(r.Context(), payload.Model)
+	car, err := ctrl.carService.CreateNewCar(r.Context(), &dto.CreateCarDto{
+		Model: payload.Model,
+		Engine: dto.EngineDto{
+			Power:   payload.Engine.Power,
+			IsTurbo: payload.Engine.IsTurbo,
+		},
+	})
 	if err != nil {
 		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][CreateCar]"))
 		return
 	}
 
-	response.Created(w, c, nil)
+	response.Created(w, car, nil)
 }
 
 func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {

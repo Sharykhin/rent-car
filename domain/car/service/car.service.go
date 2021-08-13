@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car/dto"
 	"Sharykhin/rent-car/domain/car/factory"
 	"Sharykhin/rent-car/domain/car/model"
-	"Sharykhin/rent-car/domain/car/value"
 )
 
 type (
@@ -17,6 +17,7 @@ type (
 		carRepo            CarRepositoryInterface
 		transactionService domain.TransactionInterface
 		fileStorage        FileStorageInterface
+		engineValueFactory *factory.EngineValueFactory
 	}
 )
 
@@ -25,19 +26,25 @@ func NewCarService(
 	carRepo CarRepositoryInterface,
 	transactionService domain.TransactionInterface,
 	fileStorage FileStorageInterface,
+	engineValueFactory *factory.EngineValueFactory,
 ) *CarService {
 	srv := CarService{
 		carRepo:            carRepo,
 		transactionService: transactionService,
 		fileStorage:        fileStorage,
+		engineValueFactory: engineValueFactory,
 	}
 
 	return &srv
 }
 
 // CreateNewCar creates a new car in a database and then uploads it on s3
-func (srv *CarService) CreateNewCar(ctx context.Context, model value.Model) (*model.CarModel, error) {
-	car, err := factory.NewCarModel(model)
+func (srv *CarService) CreateNewCar(ctx context.Context, dto *dto.CreateCarDto) (*model.CarModel, error) {
+	engine, err := srv.engineValueFactory.CreateEngineValue(dto.Engine.Power, dto.Engine.IsTurbo)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][CreateNewCar]")
+	}
+	car, err := factory.NewCarModel(dto.Model, engine)
 	if err != nil {
 		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][CreateNewCar]")
 	}
@@ -51,9 +58,9 @@ func (srv *CarService) CreateNewCar(ctx context.Context, model value.Model) (*mo
 }
 
 func (srv *CarService) createCar(ctx context.Context, car *model.CarModel) (*model.CarModel, error) {
-	err := srv.transactionService.Wrap(ctx, func(subCtx context.Context) error {
+	err := srv.transactionService.Wrap(ctx, func(ctx context.Context) error {
 		var err error
-		car, err = srv.carRepo.CreateCar(subCtx, car)
+		car, err = srv.carRepo.CreateCar(ctx, car)
 		if err != nil {
 			return domain.WrapErrorWithStack(err, "[domain][car][service][CarService][createCar]")
 		}
