@@ -15,6 +15,7 @@ type (
 )
 
 const (
+	// TXKey is a unique key for context that is highly likely be used by postgres repositories
 	TXKey = "postgresTXKey"
 )
 
@@ -44,13 +45,13 @@ func (t *TransactionService) Wrap(ctx context.Context, fn func(context.Context) 
 		}
 
 		return err
-	} else {
-		logger.Log.Debugf("[infrastructure][postgres][TransactionService][Wrap] Commit transaction")
-		txErr := tx.Commit()
-		if txErr != nil {
-			logger.Log.Errorf("[infrastructure][postgres][TransactionService][Wrap] failed to commit a transaction: %v", txErr)
-		}
-
-		return err
 	}
+
+	logger.Log.Debugf("[infrastructure][postgres][TransactionService][Wrap] Commit transaction")
+	txErr := tx.Commit()
+	if txErr != nil {
+		logger.Log.Errorf("[infrastructure][postgres][TransactionService][Wrap] failed to commit a transaction: %v", txErr)
+	}
+
+	return err
 }

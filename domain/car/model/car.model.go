@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"Sharykhin/rent-car/domain"
+	"Sharykhin/rent-car/domain/car/specification"
 	"Sharykhin/rent-car/domain/car/value"
 )
 
@@ -17,6 +18,23 @@ type (
 		CreatedAt time.Time          `json:"created_at"`
 	}
 )
+
+// NewCarModel creates a new car model with all validation rules applied
+// TODO: @concern the way how to pass ID looks pretty weird like it exists but empty reckon if there are better solutions
+func NewCarModel(ID domain.ID, model value.Model, engine *value.EngineValue) (*CarModel, error) {
+	c := CarModel{
+		ID:        ID,
+		Model:     model,
+		Engine:    engine,
+		CreatedAt: time.Now().UTC(),
+	}
+
+	if err := specification.IsCarModelCorrectSpecification(c.Model); err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][model][NewCarModel]")
+	}
+
+	return &c, nil
+}
 
 // MarshalJSON implements Marshaler interface to represent car model into json format
 func (c *CarModel) MarshalJSON() ([]byte, error) {

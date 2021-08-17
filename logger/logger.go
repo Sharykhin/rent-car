@@ -9,6 +9,8 @@ import (
 
 var Log *logrus.Logger
 
+// Init initializes the global logger with taking service id and log level from environment variables.
+// This function should be run at the main.go
 func Init() error {
 	serviceID := os.Getenv("SERVICE_ID")
 	if serviceID == "" {

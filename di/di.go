@@ -17,9 +17,12 @@ import (
 )
 
 var (
-	initialized             = false
+	initialized = false
+	// AlreadyInitializedError tells that di container has already been initialized, and it's forbidden to run it
+	// the second time
 	AlreadyInitializedError = errors.New("[di] di has already been initialized")
-	Container               *container
+	// Container holds the reference to the internal di container with all initialized dependencies
+	Container *container
 )
 
 type (
@@ -31,6 +34,7 @@ type (
 		PostgresRequisitionRepository *postgresRepos.PostgresRequisitionRepository
 		PostgresTransactionService    *postgres.TransactionService
 		S3Client                      *s3.Client
+		CarModelFactory               *factory.CarModelFactory
 		EngineValueFactory            *factory.EngineValueFactory
 		CarService                    *carService.CarService
 		ConsumerService               *consumerServices.ConsumerService
@@ -63,8 +67,9 @@ func Init() error {
 	s3Client := s3.NewClient(os.Getenv("AWS_S3_ENDPOINT"), isS3ForcePathStyle, os.Getenv("AWS_S3_BUCKET_NAME"), os.Getenv("AWS_S3_REGION"))
 
 	// Domain
+	carModelFactory := factory.NewCarModelFactory()
 	engineValueFactory := factory.NewEngineValueFactory(true)
-	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client, engineValueFactory)
+	carSrv := carService.NewCarService(postgresCarRepository, postgresTransactionService, s3Client, engineValueFactory, carModelFactory)
 	consumerService := consumerServices.NewConsumerService(postgresConsumerRepository, postgresTransactionService, s3Client)
 	requisitionSrv := requisitionService.NewRequisitionService(
 		postgresRequisitionRepository,
@@ -91,6 +96,7 @@ func Init() error {
 		PostgresRequisitionRepository: postgresRequisitionRepository,
 		PostgresTransactionService:    postgresTransactionService,
 		S3Client:                      s3Client,
+		CarModelFactory:               carModelFactory,
 		EngineValueFactory:            engineValueFactory,
 		CarService:                    carSrv,
 		ConsumerService:               consumerService,

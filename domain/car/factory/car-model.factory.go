@@ -1,27 +1,30 @@
 package factory
 
 import (
-	"time"
-
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/model"
-	"Sharykhin/rent-car/domain/car/specification"
 	"Sharykhin/rent-car/domain/car/value"
 )
 
-// NewCarModel creates a new car model with all validation steps
-func NewCarModel(m value.Model, e *value.EngineValue) (*model.CarModel, error) {
-	c := model.CarModel{
-		ID:        domain.Empty(),
-		Model:     m,
-		Engine:    e,
-		CreatedAt: time.Now().UTC(),
+type (
+	// CarModelFactory is responsible for creating a car domain model
+	CarModelFactory struct {
 	}
+)
 
-	err := specification.IsCarModelCorrectSpecification(&c)
+// NewCarModelFactory creates a new instance of car model factory
+func NewCarModelFactory() *CarModelFactory {
+	f := CarModelFactory{}
+
+	return &f
+}
+
+// CreateCar creates a new car
+func (c *CarModelFactory) CreateCar(carModel value.Model, engine *value.EngineValue) (*model.CarModel, error) {
+	car, err := model.NewCarModel(domain.Empty(), carModel, engine)
 	if err != nil {
-		return nil, domain.WrapErrorWithStack(err, "[domain][car][factory][NewCarModel]")
+		return car, domain.WrapErrorWithStack(err, "[domain][car][factory][CarModelFactory][CreateCar]")
 	}
 
-	return &c, nil
+	return car, err
 }

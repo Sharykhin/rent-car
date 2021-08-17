@@ -18,6 +18,7 @@ type (
 		transactionService domain.TransactionInterface
 		fileStorage        FileStorageInterface
 		engineValueFactory *factory.EngineValueFactory
+		carModelFactory    *factory.CarModelFactory
 	}
 )
 
@@ -27,12 +28,14 @@ func NewCarService(
 	transactionService domain.TransactionInterface,
 	fileStorage FileStorageInterface,
 	engineValueFactory *factory.EngineValueFactory,
+	carModelFactory *factory.CarModelFactory,
 ) *CarService {
 	srv := CarService{
 		carRepo:            carRepo,
 		transactionService: transactionService,
 		fileStorage:        fileStorage,
 		engineValueFactory: engineValueFactory,
+		carModelFactory:    carModelFactory,
 	}
 
 	return &srv
@@ -44,7 +47,7 @@ func (srv *CarService) CreateNewCar(ctx context.Context, dto *dto.CreateCarDto) 
 	if err != nil {
 		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][CreateNewCar]")
 	}
-	car, err := factory.NewCarModel(dto.Model, engine)
+	car, err := srv.carModelFactory.CreateCar(dto.Model, engine)
 	if err != nil {
 		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][CreateNewCar]")
 	}
@@ -72,7 +75,7 @@ func (srv *CarService) createCar(ctx context.Context, car *model.CarModel) (*mod
 				"[domain][car][service][CarService][createCar]",
 			)
 		}
-
+		// TODO: @concern probably we should pass the whole model inside file storage
 		err = srv.fileStorage.Upload(ctx, "cars/"+car.ID.String()+"/car.json", b)
 		if err != nil {
 			return domain.WrapErrorWithStack(err, "[domain][car][service][CarService][createCar]")

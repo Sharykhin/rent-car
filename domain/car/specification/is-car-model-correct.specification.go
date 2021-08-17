@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"Sharykhin/rent-car/domain"
-	"Sharykhin/rent-car/domain/car/model"
 	"Sharykhin/rent-car/domain/car/value"
 )
 
@@ -16,8 +15,8 @@ var (
 )
 
 // IsCarModelCorrectSpecification checks whether car model is correct
-func IsCarModelCorrectSpecification(car *model.CarModel) error {
-	isCarModelEmpty := car.Model == ""
+func IsCarModelCorrectSpecification(model value.Model) error {
+	isCarModelEmpty := model == ""
 	if isCarModelEmpty {
 		return domain.NewError(
 			ErrCarModelRequired,
@@ -26,7 +25,7 @@ func IsCarModelCorrectSpecification(car *model.CarModel) error {
 		)
 	}
 
-	switch car.Model {
+	switch model {
 	case value.BMW:
 	case value.Audi:
 	default:

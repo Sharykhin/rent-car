@@ -13,6 +13,7 @@ type (
 )
 
 var (
+	// ErrIDInvalid tells tha ID has invalid format
 	ErrIDInvalid = errors.New("id is not valid")
 )
 
@@ -53,6 +54,7 @@ func NewID() ID {
 	return ID(guid.String())
 }
 
+//Empty creates an empty domain ID
 // TODO: @improve rename to NewEmptyID cause just Empty under domain package is not clear what it means
 func Empty() ID {
 	return ID("")

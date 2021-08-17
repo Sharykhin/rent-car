@@ -59,6 +59,7 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 	response.Created(w, car, nil)
 }
 
+// GetCarByID handles rest api to get a car by its id
 func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	ID := getUrlParam(r, "id")
 

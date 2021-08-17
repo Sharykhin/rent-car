@@ -3,11 +3,14 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
 	"Sharykhin/rent-car/domain/car/model"
+	"Sharykhin/rent-car/domain/car/value"
 	"Sharykhin/rent-car/infrastructure/postgres"
 )
 
@@ -15,6 +18,14 @@ type (
 	// PostgresCarRepository implements postgres car repository
 	PostgresCarRepository struct {
 		conn *postgres.Connection
+	}
+
+	carProperties struct {
+		Engine carEngine `json:"engine"`
+	}
+	carEngine struct {
+		Power   uint64 `json:"power"`
+		IsTurbo bool   `json:"is_turbo"`
 	}
 )
 
@@ -32,19 +43,43 @@ func NewPostgresCarRepository(conn *postgres.Connection) *PostgresCarRepository 
 	return &r
 }
 
+// Value makes the carProperties struct implement the driver.Valuer interface. This method
+// simply returns the JSON-encoded representation of the struct.
+func (a carProperties) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
+// Scan makes the carProperties struct implement the sql.Scanner interface. This method
+// simply decodes a JSON-encoded value into the struct fields.
+func (a *carProperties) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return domain.NewInternalError(
+			errors.New("type assertion to []byte failed"),
+			"[infrastructure][postgres][repositories][carProperties][Scan]",
+		)
+	}
+
+	return json.Unmarshal(b, &a)
+}
+
 // CreateCar creates a new car
 func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarModel) (*model.CarModel, error) {
 	var id domain.ID
 	var err error
 
-	stmt := `insert into public.cars(model, created_at) values($1, $2) returning id`
-
-	txVal := ctx.Value(postgres.TXKey)
-	tx, ok := txVal.(*sql.Tx)
+	stmt := `insert into public.cars(model, properties, created_at) values($1, $2, $3) returning id`
+	props := carProperties{
+		Engine: carEngine{
+			Power:   car.Engine.Power,
+			IsTurbo: car.Engine.IsTurbo,
+		},
+	}
+	tx, ok := ctx.Value(postgres.TXKey).(*sql.Tx)
 	if ok {
-		err = tx.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
+		err = tx.QueryRowContext(ctx, stmt, car.Model, props, car.CreatedAt).Scan(&id)
 	} else {
-		err = r.conn.DB.QueryRowContext(ctx, stmt, car.Model, car.CreatedAt).Scan(&id)
+		err = r.conn.DB.QueryRowContext(ctx, stmt, car.Model, props, car.CreatedAt).Scan(&id)
 	}
 
 	if err != nil {
@@ -57,6 +92,7 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarMod
 	newCar := model.CarModel{
 		ID:        id,
 		Model:     car.Model,
+		Engine:    car.Engine,
 		CreatedAt: car.CreatedAt,
 	}
 
@@ -65,9 +101,10 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarMod
 
 // GetCarByID returns a car by its ID
 func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*model.CarModel, error) {
-	c := model.CarModel{}
-	stmt := `select id, model, created_at from public.cars where id = $1`
-	err := r.conn.DB.QueryRowContext(ctx, stmt, ID).Scan(&c.ID, &c.Model, &c.CreatedAt)
+	car := model.CarModel{}
+	props := carProperties{}
+	stmt := `select id, model, properties, created_at from public.cars where id = $1`
+	err := r.conn.DB.QueryRowContext(ctx, stmt, ID).Scan(&car.ID, &car.Model, &props, &car.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -84,5 +121,10 @@ func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*
 		)
 	}
 
-	return &c, nil
+	car.Engine = &value.EngineValue{
+		Power:   props.Engine.Power,
+		IsTurbo: props.Engine.IsTurbo,
+	}
+
+	return &car, nil
 }
