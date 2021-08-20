@@ -25,6 +25,7 @@ const (
 )
 
 var (
+	// TODO: these are business specific errors and not infrastructure ones. Move them in consumer sub-domain
 	ErrEmailAlreadyExists = errors.New("email is already in use")
 	// ErrConsumerNotFound describes error when car was not found
 	ErrConsumerNotFound = errors.New("consumer was not found")
