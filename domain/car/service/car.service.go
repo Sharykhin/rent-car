@@ -97,3 +97,30 @@ func (srv *CarService) GetCarByID(ctx context.Context, ID domain.ID) (*model.Car
 
 	return c, err
 }
+
+// UpdateCarByID updates an existing car
+func (srv *CarService) UpdateCarByID(ctx context.Context, ID domain.ID, dto *dto.UpdateCarDto) (*model.CarModel, error) {
+	car, err := srv.GetCarByID(ctx, ID)
+
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][UpdateCarByID]")
+	}
+
+	engine, err := srv.engineValueFactory.CreateEngineValue(dto.Engine.Power, dto.Engine.IsTurbo)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][UpdateCarByID]")
+	}
+
+	err = car.Update(dto.Model, engine)
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][UpdateCarByID]")
+	}
+
+	err = srv.carRepo.UpdateCar(ctx, car)
+
+	if err != nil {
+		return nil, domain.WrapErrorWithStack(err, "[domain][car][service][CarService][UpdateCarByID]")
+	}
+
+	return car, nil
+}

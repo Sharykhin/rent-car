@@ -99,6 +99,49 @@ func (r *PostgresCarRepository) CreateCar(ctx context.Context, car *model.CarMod
 	return &newCar, nil
 }
 
+// UpdateCar updates car record in a database
+func (r *PostgresCarRepository) UpdateCar(ctx context.Context, car *model.CarModel) error {
+	props := carProperties{
+		Engine: carEngine{
+			Power:   car.Engine.Power,
+			IsTurbo: car.Engine.IsTurbo,
+		},
+	}
+	stmt := `update public.cars set model=$1, properties=$2 where id = $3`
+	tx, ok := ctx.Value(postgres.TXKey).(*sql.Tx)
+	var res sql.Result
+	var err error
+	if ok {
+		res, err = tx.ExecContext(ctx, stmt, car.Model, props, car.ID)
+	} else {
+		res, err = r.conn.DB.ExecContext(ctx, stmt, car.Model, props, car.ID)
+	}
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return domain.NewError(
+				ErrCarNotFound,
+				"[infrastructure][postgres][repositories][PostgresCarRepository][UpdateCar]",
+				domain.ResourceNotFoundErrorCode,
+			)
+		}
+
+		return domain.NewInternalError(
+			fmt.Errorf("failed to udpate car id %s: %v", car.ID, err),
+			"[infrastructure][postgres][repositories][PostgresCarRepository][UpdateCar]",
+		)
+	}
+
+	if updatedRecords, err := res.RowsAffected(); err != nil || updatedRecords == 0 {
+		return domain.NewInternalError(
+			fmt.Errorf("failed to udpate car id %s: %v", car.ID, err),
+			"[infrastructure][postgres][repositories][PostgresCarRepository][UpdateCar]",
+		)
+	}
+
+	return nil
+}
+
 // GetCarByID returns a car by its ID
 func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*model.CarModel, error) {
 	car := model.CarModel{}

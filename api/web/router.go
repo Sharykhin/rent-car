@@ -26,6 +26,7 @@ func router() http.Handler {
 
 	sr.HandleFunc("/cars", carController.CreateCar).Methods("POST")
 	sr.HandleFunc("/cars/{id}", carController.GetCarByID).Methods("GET")
+	sr.HandleFunc("/cars/{id}", carController.UpdateCarByID).Methods("PUT")
 	sr.HandleFunc("/consumers", consumerController.CreateConsumer).Methods("POST")
 	sr.HandleFunc("/requisitions", requisitionController.CreateRequisition).Methods("POST")
 

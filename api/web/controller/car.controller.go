@@ -19,14 +19,24 @@ type (
 
 	// CreateCarPayload this is a request body for creating a new car
 	CreateCarPayload struct {
-		Model  value.Model `json:"model"`
-		Engine struct {
-			Power   uint64 `json:"power"`
-			IsTurbo bool   `json:"is_turbo"`
-		} `json:"engine"`
+		Model  value.Model   `json:"model"`
+		Engine EnginePayload `json:"engine"`
+	}
+
+	// UpdateCarPayload contains data to update a ca
+	UpdateCarPayload struct {
+		Model  value.Model   `json:"model"`
+		Engine EnginePayload `json:"engine"`
+	}
+
+	// EnginePayload describes web payload around engine value
+	EnginePayload struct {
+		Power   uint64 `json:"power"`
+		IsTurbo bool   `json:"is_turbo"`
 	}
 )
 
+// NewCarController creates a new instance of web controller that handles http requests around car model
 func NewCarController(carSrv *service.CarService) *CarController {
 	ctrl := CarController{
 		carService: carSrv,
@@ -46,7 +56,7 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 	car, err := ctrl.carService.CreateNewCar(r.Context(), &dto.CreateCarDto{
 		Model: payload.Model,
-		Engine: dto.EngineDto{
+		Engine: dto.EngineValueDto{
 			Power:   payload.Engine.Power,
 			IsTurbo: payload.Engine.IsTurbo,
 		},
@@ -63,13 +73,36 @@ func (ctrl *CarController) CreateCar(w http.ResponseWriter, r *http.Request) {
 func (ctrl *CarController) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	ID := getUrlParam(r, "id")
 
-	c, err := ctrl.carService.GetCarByID(r.Context(), domain.ID(ID))
+	car, err := ctrl.carService.GetCarByID(r.Context(), domain.ID(ID))
 
 	if err != nil {
 		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][GetCarByID]"))
 		return
 	}
 
-	response.Success(w, c, nil)
+	response.Success(w, car, nil)
+}
 
+func (ctrl *CarController) UpdateCarByID(w http.ResponseWriter, r *http.Request) {
+	var payload UpdateCarPayload
+	if err := util.DecodeJSONBody(w, r, &payload); err != nil {
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][UpdateCarByID]"))
+		return
+	}
+
+	ID := getUrlParam(r, "id")
+
+	car, err := ctrl.carService.UpdateCarByID(r.Context(), domain.ID(ID), &dto.UpdateCarDto{
+		Model: payload.Model,
+		Engine: dto.EngineValueDto{
+			Power:   payload.Engine.Power,
+			IsTurbo: payload.Engine.IsTurbo,
+		},
+	})
+	if err != nil {
+		response.Fail(w, domain.WrapErrorWithStack(err, "[api][web][controller][CarController][GetCarByID]"))
+		return
+	}
+
+	response.Success(w, car, nil)
 }

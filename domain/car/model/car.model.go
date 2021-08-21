@@ -48,3 +48,15 @@ func (c *CarModel) MarshalJSON() ([]byte, error) {
 		CreatedAt: c.CreatedAt.Format(time.RFC3339),
 	})
 }
+
+func (c *CarModel) Update(model value.Model, engine *value.EngineValue) error {
+	c.Model = model
+
+	if err := specification.IsCarModelCorrectSpecification(c.Model); err != nil {
+		return domain.WrapErrorWithStack(err, "[domain][car][model][NewCarModel]")
+	}
+
+	c.Engine = engine
+
+	return nil
+}
