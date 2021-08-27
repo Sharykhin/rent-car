@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"Sharykhin/rent-car/domain"
+	carDomain "Sharykhin/rent-car/domain/car"
 	"Sharykhin/rent-car/domain/car/model"
 	"Sharykhin/rent-car/domain/car/value"
 	"Sharykhin/rent-car/infrastructure/postgres"
@@ -27,11 +28,6 @@ type (
 		Power   uint64 `json:"power"`
 		IsTurbo bool   `json:"is_turbo"`
 	}
-)
-
-var (
-	// ErrCarNotFound describes error when car was not found
-	ErrCarNotFound = errors.New("car was not found")
 )
 
 // NewPostgresCarRepository creates a new car repository instance
@@ -120,7 +116,7 @@ func (r *PostgresCarRepository) UpdateCar(ctx context.Context, car *model.CarMod
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return domain.NewError(
-				ErrCarNotFound,
+				carDomain.ErrCarNotFound,
 				"[infrastructure][postgres][repositories][PostgresCarRepository][UpdateCar]",
 				domain.ResourceNotFoundErrorCode,
 			)
@@ -152,7 +148,7 @@ func (r *PostgresCarRepository) GetCarByID(ctx context.Context, ID domain.ID) (*
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.NewError(
-				ErrCarNotFound,
+				carDomain.ErrCarNotFound,
 				"[infrastructure][postgres][repositories][PostgresCarRepository][GetCarByID]",
 				domain.ResourceNotFoundErrorCode,
 			)
