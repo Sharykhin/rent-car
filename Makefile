@@ -25,3 +25,6 @@ migrate-up:
 
 migrate-down:
 	docker run --network $(network) -v ${current_dir}/db/migrations:/db/migrations migrate/migrate -database ${POSTGRES_URL} -path db/migrations down 1
+
+mockery:
+	docker run -w /app -v ${current_dir}:/app vektra/mockery --dir=$(dir) --all --output=$(output)
