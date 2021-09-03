@@ -12,5 +12,6 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v0.0.0-20180402223658-b729f2633dfe // indirect
 	github.com/lib/pq v1.10.0
 	github.com/sirupsen/logrus v1.8.1
+	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.7.0
 )

@@ -32,10 +32,18 @@ Then an error is returned`,
 		},
 		{
 			name: `
-Given a valid car model
+Given a BMW car model
 When it is supported one
 When nil error is returned`,
 			inModel:     value.BMW,
+			expectedErr: nil,
+		},
+		{
+			name: `
+Given an Audi car model
+When it is supported one
+When nil error is returned`,
+			inModel:     value.Audi,
 			expectedErr: nil,
 		},
 	}
